@@ -1,0 +1,6 @@
+.*
+!.gitignore
+**.test
+**.o
+**.run
+**.ao
