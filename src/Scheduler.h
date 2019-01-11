@@ -13,14 +13,19 @@ namespace arc {
     class Subscription {
     public:
         virtual bool unsubscribe() = 0;
+        virtual ~Subscription(){};
     };
 
     class Scheduler {
     public:
+        class TaskNode;
+        class SingleTaskNode;
+        class PeriodicTaskNode;
+        class TaskSubscription;
         unsigned long tick();
         void loop();
-        void timeout(unsigned int msWait, task_t task);
-        void every(unsigned int msPeriod, task_t task);
+        TaskSubscription timeout(unsigned int msWait, task_t task);
+        TaskSubscription every(unsigned int msPeriod, task_t task);
         void debug(Stream& stream);
         virtual ~Scheduler();
         class TaskNode {
@@ -47,6 +52,7 @@ namespace arc {
         class TaskSubscription : public Subscription{        
         public:
             TaskSubscription(Scheduler&,TaskNode*);
+            TaskSubscription(const TaskSubscription&);
             bool unsubscribe();
         protected:
             Scheduler& scheduler;
@@ -55,6 +61,7 @@ namespace arc {
     protected:
         TaskNode headNode;
         void addTask(TaskNode * taskNode);
+        bool removeTask(TaskNode * taskNode);
     };
 
 

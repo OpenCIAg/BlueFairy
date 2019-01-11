@@ -70,16 +70,18 @@ namespace arc {
         }
     }
 
-    void Scheduler::timeout(unsigned int msWait, task_t task){
+    Scheduler::TaskSubscription Scheduler::timeout(unsigned int msWait, task_t task){
         unsigned long doWhen = millis() + msWait;
         TaskNode * node  = new Scheduler::SingleTaskNode(doWhen, task);
         this->addTask(node);
+        return Scheduler::TaskSubscription(*this,node);
     }
 
-    void Scheduler::every(unsigned int msInterval, task_t task) {
+    Scheduler::TaskSubscription Scheduler::every(unsigned int msInterval, task_t task) {
         unsigned long doWhen = millis() + msInterval;
         TaskNode * node = new Scheduler::PeriodicTaskNode(doWhen, msInterval, task);
         this->addTask(node);
+        return Scheduler::TaskSubscription(*this,node);
     }
 
     void Scheduler::addTask(TaskNode * newNode) {
@@ -89,6 +91,18 @@ namespace arc {
         }
         newNode->next = node->next;
         node->next = newNode;
+    }
+
+    bool Scheduler::removeTask(TaskNode * rmNode) {
+        TaskNode * node = &this->headNode;
+        while(node->next != NULL && node->next != rmNode){
+            node = node->next;
+        }
+        if(node->next == rmNode){
+            node->next = rmNode->next;
+            return true;
+        }
+        return false;
     }
 
     void Scheduler::debug(Stream& stream){
@@ -105,12 +119,18 @@ namespace arc {
         stream.println("");
     }
 
+    Scheduler::TaskSubscription::TaskSubscription(const TaskSubscription& origin) : scheduler(origin.scheduler) {
+        this->task  = origin.task;
+    }
+
     Scheduler::TaskSubscription::TaskSubscription(Scheduler& scheduler, Scheduler::TaskNode * taskNode) : scheduler(scheduler) {
         this->task  = taskNode;
     }
 
     bool Scheduler::TaskSubscription::unsubscribe() {
-        return false;
+        bool result = this->scheduler.removeTask(this->task);
+        delete this->task;
+        return result;
     }
 
 }
