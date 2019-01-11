@@ -24,6 +24,7 @@ namespace arc {
             virtual void run(Scheduler& scheduler);
             TaskNode * next;
             TaskNode();
+            virtual ~TaskNode(){};
         };
         class SingleTaskNode: public TaskNode {
         public:
