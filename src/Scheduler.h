@@ -25,7 +25,10 @@ namespace arc {
         unsigned long tick();
         void loop();
         TaskSubscription timeout(unsigned int msWait, task_t task);
-        TaskSubscription every(unsigned int msPeriod, task_t task);
+        TaskSubscription every(unsigned int msInterval, task_t task);
+        TaskSubscription every(unsigned int firstInterval, unsigned int msInterval, task_t task);
+        TaskSubscription repeat(unsigned int times, unsigned int msInterval, task_t task);
+        TaskSubscription repeat(unsigned int times, unsigned int firstInterval, unsigned int msInterval, task_t task);
         void debug(Stream& stream);
         virtual ~Scheduler();
         class TaskNode {
@@ -42,12 +45,17 @@ namespace arc {
             SingleTaskNode(unsigned long when, task_t action);
         };
         class PeriodicTaskNode : public TaskNode {
-        protected:
-            PeriodicTaskNode* makeNext() const;
         public:
             unsigned int interval;
             virtual bool run(Scheduler& scheduler);
             PeriodicTaskNode(unsigned long when, unsigned int interval, task_t action);
+        };
+        class ExpirableTaskNode : public PeriodicTaskNode{
+        public:
+            unsigned int counter;
+            unsigned int times;
+            virtual bool run(Scheduler& scheduler);
+            ExpirableTaskNode(unsigned int times, unsigned long when, unsigned int interval, task_t action);
         };
         class TaskSubscription : public Subscription{        
         public:

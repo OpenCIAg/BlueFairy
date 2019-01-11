@@ -14,7 +14,9 @@ void setup(){
     Serial.begin(9600);
     pinMode(LED_PIN, OUTPUT);
     digitalWrite(LED_PIN, LED_VALUE);
-    scheduler.every(1000, toggleLed);
+    scheduler.repeat(5, 250, 500, toggleLed);
+    scheduler.repeat(5, 0, 500, toggleLed);
+    scheduler.every(3000, 1000, toggleLed);
 }
 
 void loop(){

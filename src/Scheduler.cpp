@@ -38,6 +38,23 @@ namespace arc {
         return false;
     }
 
+    Scheduler::ExpirableTaskNode::ExpirableTaskNode( unsigned int times, unsigned long when , unsigned int interval, task_t action)
+        : PeriodicTaskNode(when,interval,action){
+            this->counter = 0;
+            this->times = times;
+        }
+
+    bool Scheduler::ExpirableTaskNode::run(Scheduler& scheduler) {
+        this->action(scheduler);
+        this->counter += 1;
+        this->when += this->interval;
+        bool repeat = this->counter < this->times;
+        if(repeat) {
+            scheduler.addTask(this);
+        }
+        return !repeat;
+    }
+
     Scheduler::~Scheduler() {
         TaskNode * taskNode = this->headNode.next;
         while(taskNode != NULL) {
@@ -78,10 +95,25 @@ namespace arc {
     }
 
     Scheduler::TaskSubscription Scheduler::every(unsigned int msInterval, task_t task) {
-        unsigned long doWhen = millis() + msInterval;
+        return this->every(msInterval, msInterval, task);
+    }
+
+    Scheduler::TaskSubscription Scheduler::every(unsigned int firstInterval, unsigned int msInterval, task_t task) {
+        unsigned long doWhen = millis() + firstInterval;
         TaskNode * node = new Scheduler::PeriodicTaskNode(doWhen, msInterval, task);
         this->addTask(node);
-        return Scheduler::TaskSubscription(*this,node);
+        return Scheduler::TaskSubscription(*this, node);
+    }
+
+    Scheduler::TaskSubscription Scheduler::repeat(unsigned int times, unsigned int msInterval, task_t task){
+        return this->repeat(times, msInterval, msInterval, task);
+    }
+
+    Scheduler::TaskSubscription Scheduler::repeat(unsigned int times, unsigned int firstInterval, unsigned int msInterval, task_t task){
+        unsigned long doWhen = millis() + firstInterval;
+        TaskNode * node = new Scheduler::ExpirableTaskNode(times, doWhen, msInterval, task);
+        this->addTask(node);
+        return Scheduler::TaskSubscription(*this, node);
     }
 
     void Scheduler::addTask(TaskNode * newNode) {
