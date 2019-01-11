@@ -6,8 +6,14 @@
 namespace arc {
 
     class Scheduler;
+    class Subscription;
 
     typedef void (*task_t)(Scheduler&);
+
+    class Subscription {
+    public:
+        virtual bool unsubscribe() = 0;
+    };
 
     class Scheduler {
     public:
@@ -21,7 +27,7 @@ namespace arc {
         public:
             task_t action;
             unsigned long when;
-            virtual void run(Scheduler& scheduler);
+            virtual bool run(Scheduler& scheduler);
             TaskNode * next;
             TaskNode();
             virtual ~TaskNode(){};
@@ -35,8 +41,16 @@ namespace arc {
             PeriodicTaskNode* makeNext() const;
         public:
             unsigned int interval;
-            virtual void run(Scheduler& scheduler);
+            virtual bool run(Scheduler& scheduler);
             PeriodicTaskNode(unsigned long when, unsigned int interval, task_t action);
+        };
+        class TaskSubscription : public Subscription{        
+        public:
+            TaskSubscription(Scheduler&,TaskNode*);
+            bool unsubscribe();
+        protected:
+            Scheduler& scheduler;
+            TaskNode * task;
         };
     protected:
         TaskNode headNode;

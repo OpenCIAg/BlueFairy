@@ -14,8 +14,9 @@ namespace arc {
         this->next = NULL;
     }
 
-    void Scheduler::TaskNode::run(Scheduler& scheduler) {
+    bool Scheduler::TaskNode::run(Scheduler& scheduler) {
         this->action(scheduler);
+        return true;
     }
 
     Scheduler::SingleTaskNode::SingleTaskNode(unsigned long when, task_t action) {
@@ -30,14 +31,11 @@ namespace arc {
         this->action = action;
     }
 
-    Scheduler::PeriodicTaskNode* Scheduler::PeriodicTaskNode::makeNext() const {
-        return new Scheduler::PeriodicTaskNode(this->when + this->interval, this->interval, this->action);
-    }
-
-    void Scheduler::PeriodicTaskNode::run(Scheduler& scheduler) {
-        TaskNode * nextIteration = this->makeNext();
+    bool Scheduler::PeriodicTaskNode::run(Scheduler& scheduler) {
         this->action(scheduler);
-        scheduler.addTask(nextIteration);
+        this->when += this->interval;
+        scheduler.addTask(this);
+        return false;
     }
 
     Scheduler::~Scheduler() {
@@ -57,8 +55,9 @@ namespace arc {
             }
             TaskNode * taskNode = this->headNode.next;
             this->headNode.next = taskNode->next;
-            taskNode->run(*this);
-            delete taskNode;
+            if(taskNode->run(*this)){
+                delete taskNode;
+            }
             currentTime = millis();
         }
         return 0;
@@ -104,6 +103,14 @@ namespace arc {
             taskNode = taskNode->next;
         }
         stream.println("");
+    }
+
+    Scheduler::TaskSubscription::TaskSubscription(Scheduler& scheduler, Scheduler::TaskNode * taskNode) : scheduler(scheduler) {
+        this->task  = taskNode;
+    }
+
+    bool Scheduler::TaskSubscription::unsubscribe() {
+        return false;
     }
 
 }
