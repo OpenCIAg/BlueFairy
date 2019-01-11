@@ -24,6 +24,7 @@ void digitalWrite(byte pin, byte value){
 }
 
 byte digitalRead(byte pin){
+  printf("Get pin[%d] value\n");
 	return 0;
 }
 

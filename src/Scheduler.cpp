@@ -36,8 +36,8 @@ namespace arc {
 
     void Scheduler::PeriodicTaskNode::run(Scheduler& scheduler) {
         TaskNode * nextIteration = this->makeNext();
-        scheduler.addTask(nextIteration);
         this->action(scheduler);
+        scheduler.addTask(nextIteration);
     }
 
     Scheduler::~Scheduler() {
@@ -51,19 +51,16 @@ namespace arc {
 
     unsigned long Scheduler::tick() {
         unsigned long currentTime = millis();
-        TaskNode * taskNode = this->headNode.next;
-        while(taskNode != NULL) {
-            if(taskNode->when > currentTime) {
-                this->headNode.next = taskNode;
-                return taskNode->when - currentTime;
+        while(this->headNode.next != NULL) {
+            if(this->headNode.next->when > currentTime) {
+                return this->headNode.next->when - currentTime;
             }
+            TaskNode * taskNode = this->headNode.next;
+            this->headNode.next = taskNode->next;
             taskNode->run(*this);
-            TaskNode * executed = taskNode;
-            taskNode = taskNode->next;
-            delete executed;
+            delete taskNode;
             currentTime = millis();
         }
-        this->headNode.next = NULL;
         return 0;
     }
 
@@ -96,6 +93,10 @@ namespace arc {
     }
 
     void Scheduler::debug(Stream& stream){
+        stream.println("Scheduler::debug");
+        stream.print("Now: ");
+        stream.println(millis());
+        stream.print("Scheduler Tasks: ");
         TaskNode * taskNode = this->headNode.next;
         while(taskNode != NULL) {
             stream.print(taskNode->when);
