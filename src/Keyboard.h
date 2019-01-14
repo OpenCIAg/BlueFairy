@@ -54,7 +54,7 @@ namespace arc {
             this->onKeyDown[i] = noop;
             this->onKeyUp[i] = noop;
             this->onHoldDown[i] = noop;
-            this->holdTicks[i] = -1;
+            this->holdTicks[i] = 0;
             this->lastChange[i] = 0;
         }
     }
@@ -74,20 +74,17 @@ namespace arc {
             KeyEvent event(i, edges[i], holdTicks, lastChange, value);
             switch(edges[i]){
                 case Edge::Posedge:
-                    this->holdTicks[i] = -1;
+                    this->holdTicks[i] = 0;
                     this->lastChange[i] = now;
                     this->onKeyDown[i](event);
                     break;
                 case Edge::Negedge:
-                    this->holdTicks[i] = -1;
+                    this->holdTicks[i] = 0;
                     this->onKeyUp[i](event);
                     this->lastChange[i] = now;
                     break;
                 case Edge::None:
                 default:
-                    if(value) {
-                        this->onHoldDown[i](event);
-                    }
                     break;
             }
 
@@ -100,6 +97,18 @@ namespace arc {
             this->holdTicks[i] += 1;
         }
         this->edgeDetector.tick();
+        for(size_t i =0; i < SIZE; ++i){
+            const unsigned int holdTicks = this->holdTicks[i];
+            if(holdTicks == 0){
+                continue;
+            }
+            const unsigned long lastChange = this->lastChange[i];
+            const bool value = this->edgeDetector[i];
+            KeyEvent event(i, Edge::None, holdTicks, lastChange, value);
+            if(this->edgeDetector[i]){
+                this->onHoldDown[i](event);
+            }
+        }
     }
 
 }
