@@ -38,6 +38,13 @@ void setup(){
         Serial.print("LastChange: ");
         Serial.println(event.lastChange);
     };
+    keyboard.onHoldDown[On] = [](const arc::KeyEvent& event) {
+        Serial.println("onHoldDown(On)");
+        Serial.print("HoldTicks: ");
+        Serial.println(event.holdTicks);
+        Serial.print("LastChange: ");
+        Serial.println(event.lastChange);
+    };
     keyboard.onKeyDown[Off] = [](const arc::KeyEvent& event) {
         Serial.println("onKeyDown(Off)");
         Serial.print("HoldTicks: ");
@@ -47,6 +54,13 @@ void setup(){
     };
     keyboard.onKeyUp[Off] = [](const arc::KeyEvent& event) {
         Serial.println("onKeyUp(Off)");
+        Serial.print("HoldTicks: ");
+        Serial.println(event.holdTicks);
+        Serial.print("LastChange: ");
+        Serial.println(event.lastChange);
+    };
+    keyboard.onHoldDown[Off] = [](const arc::KeyEvent& event) {
+        Serial.println("onHoldDown(Off)");
         Serial.print("HoldTicks: ");
         Serial.println(event.holdTicks);
         Serial.print("LastChange: ");

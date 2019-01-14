@@ -10,12 +10,14 @@ namespace arc {
         Edge edge;
         unsigned int holdTicks;
         unsigned long lastChange;
+        bool value;
 
-        KeyEvent(size_t key, Edge edge, unsigned int holdTicks, unsigned long lastChange) {
+        KeyEvent(size_t key, Edge edge, unsigned int holdTicks, unsigned long lastChange, bool value) {
             this->key = key;
             this->edge = edge;
             this->holdTicks = holdTicks;
             this->lastChange = lastChange;
+            this->value = value;
         }
 
         unsigned int holdTime() const {
@@ -38,6 +40,7 @@ namespace arc {
         unsigned int holdTicks[SIZE];
         key_action_t onKeyDown[SIZE];
         key_action_t onKeyUp[SIZE];
+        key_action_t onHoldDown[SIZE];
         void edgeTrigger(const Edge* const edges);
         void operator()(const Edge* const edges);
     protected:
@@ -50,6 +53,7 @@ namespace arc {
         for(size_t i =0;i<SIZE;++i){
             this->onKeyDown[i] = noop;
             this->onKeyUp[i] = noop;
+            this->onHoldDown[i] = noop;
             this->holdTicks[i] = -1;
             this->lastChange[i] = 0;
         }
@@ -66,22 +70,27 @@ namespace arc {
         for(size_t i =0;i<SIZE;i+=1){
             const unsigned int holdTicks = this->holdTicks[i];
             const unsigned long lastChange = this->lastChange[i];
-            KeyEvent event(i, edges[i], holdTicks, lastChange);
+            const bool value = this->edgeDetector[i];
+            KeyEvent event(i, edges[i], holdTicks, lastChange, value);
             switch(edges[i]){
-                case Edge::Negedge:
+                case Edge::Posedge:
                     this->holdTicks[i] = -1;
                     this->lastChange[i] = now;
                     this->onKeyDown[i](event);
                     break;
-                case Edge::Posedge:
+                case Edge::Negedge:
                     this->holdTicks[i] = -1;
                     this->onKeyUp[i](event);
                     this->lastChange[i] = now;
                     break;
                 case Edge::None:
                 default:
+                    if(value) {
+                        this->onHoldDown[i](event);
+                    }
                     break;
             }
+
         }
     }
 
