@@ -24,17 +24,33 @@ void setup(){
     scheduler.every(50, [](arc::Scheduler& scheduler){
         keyboard.tick();
     });
-    keyboard.onKeyDown[On] = []() {
+    keyboard.onKeyDown[On] = [](const arc::KeyEvent& event) {
         Serial.println("onKeyDown(On)");
+        Serial.print("HoldTicks: ");
+        Serial.println(event.holdTicks);
+        Serial.print("LastChange: ");
+        Serial.println(event.lastChange);
     };
-    keyboard.onKeyUp[On] = []() {
+    keyboard.onKeyUp[On] = [](const arc::KeyEvent& event) {
         Serial.println("onKeyUp(On)");
+        Serial.print("HoldTicks: ");
+        Serial.println(event.holdTicks);
+        Serial.print("LastChange: ");
+        Serial.println(event.lastChange);
     };
-    keyboard.onKeyDown[Off] = []() {
+    keyboard.onKeyDown[Off] = [](const arc::KeyEvent& event) {
         Serial.println("onKeyDown(Off)");
+        Serial.print("HoldTicks: ");
+        Serial.println(event.holdTicks);
+        Serial.print("LastChange: ");
+        Serial.println(event.lastChange);
     };
-    keyboard.onKeyUp[Off] = []() {
+    keyboard.onKeyUp[Off] = [](const arc::KeyEvent& event) {
         Serial.println("onKeyUp(Off)");
+        Serial.print("HoldTicks: ");
+        Serial.println(event.holdTicks);
+        Serial.print("LastChange: ");
+        Serial.println(event.lastChange);
     };
 }
 
