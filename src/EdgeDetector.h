@@ -15,11 +15,12 @@ namespace arc {
     
     typedef void (*trigger_t)(const Edge* const);
 
-    template<size_t SIZE>
+    template<size_t SIZE, typename C = trigger_t>
     class EdgeDetector {
     public:
-        EdgeDetector(const byte (&pins)[SIZE]);
-        trigger_t trigger = [](const Edge* const edges){};
+        EdgeDetector(const byte* const pins);
+        EdgeDetector(const byte* const pins, C trigger);
+        C trigger;
         bool operator[] (size_t index) const;
         void tick();
         void loop();
@@ -33,50 +34,58 @@ namespace arc {
         void readAndCalcAll();
     };
 
-    template<size_t SIZE>
-    EdgeDetector<SIZE>::EdgeDetector(const byte (&pins)[SIZE]) {
+    template<size_t SIZE, typename C>
+    EdgeDetector<SIZE,C>::EdgeDetector(const byte* const pins){
+        this->trigger = [](const Edge* const edges){};
         this->pins = pins;
+        this->init();
+    }
+
+    template<size_t SIZE, typename C>
+    EdgeDetector<SIZE,C>::EdgeDetector(const byte* const pins, C trigger) : trigger(trigger) {
+        this->pins = pins;
+        this->init();
     }
 
 
-    template<size_t SIZE>
-    bool EdgeDetector<SIZE>::operator[](size_t index) const{
+    template<size_t SIZE, typename C>
+    bool EdgeDetector<SIZE,C>::operator[](size_t index) const{
         return this->pinsValues[index];
     }
 
-    template<size_t SIZE>
-    void EdgeDetector<SIZE>::tick() {
+    template<size_t SIZE, typename C>
+    void EdgeDetector<SIZE,C>::tick() {
         this->readAndCalcAll();
     }
 
-    template<size_t SIZE>
-    void EdgeDetector<SIZE>::loop() {
+    template<size_t SIZE, typename C>
+    void EdgeDetector<SIZE,C>::loop() {
         this->loop(50);
     }
 
-    template<size_t SIZE>
-    void EdgeDetector<SIZE>::loop(unsigned int intervalMs) {
+    template<size_t SIZE, typename C>
+    void EdgeDetector<SIZE,C>::loop(unsigned int intervalMs) {
         for(;;){
             this->tick();
         }
     }
 
 
-    template<size_t SIZE>
-    void EdgeDetector<SIZE>::init() {
+    template<size_t SIZE, typename C>
+    void EdgeDetector<SIZE,C>::init() {
         for(size_t i = 0; i < SIZE ; ++i){
             pinMode(this->pins[i], INPUT);
-            this->pinsValues[i] = digitalRead(i);
+            this->pinsValues[i] = digitalRead(this->pins[i]);
         }
     }
 
-    template<size_t SIZE>
-    bool EdgeDetector<SIZE>::justRead(const size_t pin) {
+    template<size_t SIZE, typename C>
+    bool EdgeDetector<SIZE,C>::justRead(const size_t pin) {
         return digitalRead(this->pins[pin]);
     }
 
-    template<size_t SIZE>
-    Edge EdgeDetector<SIZE>::readAndCalc(const size_t pin) {
+    template<size_t SIZE, typename C>
+    Edge EdgeDetector<SIZE,C>::readAndCalc(const size_t pin) {
         const auto oldValue = this->pinsValues[pin];
         const auto newValue = this->justRead(pin);
         this->pinsValues[pin] = newValue;
@@ -91,8 +100,8 @@ namespace arc {
         }
     }
 
-    template<size_t SIZE>
-    void EdgeDetector<SIZE>::readAndCalcAll() {
+    template<size_t SIZE, typename C>
+    void EdgeDetector<SIZE,C>::readAndCalcAll() {
         bool fireTrigger = false;
         Edge edges[SIZE];
         for(size_t i = 0; i < SIZE; ++i) {

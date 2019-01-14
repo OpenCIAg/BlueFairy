@@ -1,11 +1,16 @@
 #include "Scheduler.h"
-#include "EdgeDetector.h"
+#include "Keyboard.h"
 
 const int LED_PIN = 13;
 int LED_VALUE = 0;
 
 arc::Scheduler scheduler;
-arc::EdgeDetector<1> keyboard({0});
+arc::Keyboard<2> keyboard((byte[]){0,1});
+
+enum Button {
+    On=0,
+    Off
+};
 
 void toggleLed(){
     LED_VALUE = (LED_VALUE + 1) % 2;
@@ -19,10 +24,17 @@ void setup(){
     scheduler.every(50, [](arc::Scheduler& scheduler){
         keyboard.tick();
     });
-    keyboard.trigger = [](const arc::Edge* const edges) {
-        if(edges[0] == arc::Edge::Negedge) {
-            toggleLed();
-        }
+    keyboard.onKeyDown[On] = []() {
+        Serial.println("onKeyDown(On)");
+    };
+    keyboard.onKeyUp[On] = []() {
+        Serial.println("onKeyUp(On)");
+    };
+    keyboard.onKeyDown[Off] = []() {
+        Serial.println("onKeyDown(Off)");
+    };
+    keyboard.onKeyUp[Off] = []() {
+        Serial.println("onKeyUp(Off)");
     };
 }
 

@@ -24,8 +24,9 @@ void digitalWrite(byte pin, byte value){
 }
 
 byte digitalRead(byte pin){
-  printf("Get pin[%d] value\n");
-	return 0;
+  const int value = abs(rand()) & 1023 > 512 ? 1: 0;
+  printf("Get pin[%d] value: %d\n",pin,value);
+	return value;
 }
 
 unsigned short analogRead(byte pin){
