@@ -35,7 +35,6 @@ namespace arc {
     public:
         Keyboard(const byte* const pins);
         void tick();
-        unsigned long lastTick;
         unsigned long lastChange[SIZE];
         unsigned int holdTicks[SIZE];
         key_action_t onKeyDown[SIZE];
@@ -49,7 +48,6 @@ namespace arc {
 
     template<size_t SIZE>
     Keyboard<SIZE>::Keyboard(const byte* const pins): edgeDetector(pins,*this){
-        this->lastTick = millis();
         for(size_t i =0;i<SIZE;++i){
             this->onKeyDown[i] = noop;
             this->onKeyUp[i] = noop;
