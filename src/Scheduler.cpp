@@ -1,6 +1,4 @@
 #include "Scheduler.h"
-#include "iostream"
-
 
 namespace arc {
 
