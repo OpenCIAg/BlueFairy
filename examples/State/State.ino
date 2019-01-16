@@ -1,6 +1,7 @@
 #include "State.h"
 #include "Scheduler.h"
 #include "Keyboard.h"
+#include "arc.h"
 
 arc::Scheduler scheduler;
 arc::Keyboard<2> keyboard((byte[]){0, 1});
@@ -21,14 +22,16 @@ enum AppState {
 };
 
 class InitState : public arc::State<IO&> {
+protected:
+    arc::TaskNode * keyboardTask = NULL;
 public:
     void enter(arc::Scheduler& scheduler, IO& io){
-        scheduler.every(50, [io](arc::Scheduler& scheduler) {
+        this->keyboardTask = scheduler.every(50, [io](arc::Scheduler& scheduler) {
             io.keyboard.tick();
         });
     }
-    void out(arc::Scheduler& scheduler, IO& io){
-
+    void leave(arc::Scheduler& scheduler, IO& io){
+        safeClean(this->keyboardTask);
     }
 };
 
