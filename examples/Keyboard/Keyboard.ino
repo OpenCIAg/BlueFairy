@@ -21,7 +21,7 @@ void setup(){
     Serial.begin(9600);
     pinMode(LED_PIN, OUTPUT);
     digitalWrite(LED_PIN, LED_VALUE);
-    scheduler.every(50, [](arc::Scheduler& scheduler){
+    scheduler.every(50, [](){
         keyboard.tick();
     });
     keyboard.onKeyDown[On] = [](const arc::KeyEvent& event) {

@@ -5,7 +5,7 @@ int LED_VALUE = 0;
 
 arc::Scheduler scheduler;
 
-void toggleLed(arc::Scheduler &scheduler){
+void toggleLed(){
     LED_VALUE = (LED_VALUE + 1) % 2;
     digitalWrite(LED_PIN, LED_VALUE);
 }
@@ -18,7 +18,7 @@ void setup(){
         scheduler.timeout(500*i, toggleLed);    
         scheduler.timeout(500*(i+1), toggleLed);
     }
-    scheduler.every(1000, [](arc::Scheduler& scheduler){
+    scheduler.every(1000, [](){
         scheduler.debug(Serial);
     });
 }

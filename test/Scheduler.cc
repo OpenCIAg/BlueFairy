@@ -12,7 +12,7 @@ using namespace arc;
 int counter = 1;
 
 
-void add_and_print(Scheduler& scheduler) {
+void add_and_print() {
     std::cout << "add_and_print" << std::endl;
     std::cout << ++counter << std::endl;
 }
@@ -34,10 +34,11 @@ TEST(Scheduler, Timeout){
     EXPECT_EQ(counter,4);
 }
 
+Scheduler scheduler;
 
 TEST(Schedule, Every) {
-    Scheduler scheduler;
-    scheduler.every(100, [](Scheduler& scheduler) {
+    
+    scheduler.every(100, []() {
        scheduler.debug(Serial);
     });
     for(int i = 0;i<10;i+=1){

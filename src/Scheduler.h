@@ -12,7 +12,7 @@ namespace arc {
 
     class Task {
     public:
-        virtual void operator()(Scheduler&) = 0;
+        virtual void operator()() = 0;
         ~Task();
     };
 
@@ -20,7 +20,7 @@ namespace arc {
     class GenericTask {
     public:
         GenericTask(F function) : function(function) {};
-        void operator()(Scheduler& scheduler) { this->function(scheduler); }
+        void operator()() { this->function(); }
     protected:
         F function;
     };
@@ -95,7 +95,7 @@ namespace arc {
         BaseTaskNode(Scheduler& scheduler, A action) : TaskNode(scheduler), action(action) {};
 
         virtual bool run() {
-            this->action(this->scheduler);
+            this->action();
             return true;
         }
     };
@@ -115,7 +115,7 @@ namespace arc {
         unsigned int interval;
 
         virtual bool run() {
-            this->action(this->scheduler);
+            this->action();
             this->when += this->interval;
             this->scheduler.addTask(this);
             return false;
@@ -133,7 +133,7 @@ namespace arc {
         unsigned int counter;
         unsigned int times;
         virtual bool run() {
-            this->action(this->scheduler);
+            this->action();
             this->counter += 1;
             this->when += this->interval;
             bool repeat = this->counter < this->times;

@@ -16,9 +16,16 @@ IO io = {
     .keyboard=keyboard
 };
 
+arc::StateMachine<1,IO&> stateMachine(scheduler, io);
+
+enum Button {
+    Next = 0,
+    Prev
+};
+
 enum AppState {
     INIT=0,
-    __SIZE__
+    FIRST
 };
 
 class InitState : public arc::State<IO&> {
@@ -26,9 +33,12 @@ protected:
     arc::TaskNode * keyboardTask = NULL;
 public:
     void enter(arc::Scheduler& scheduler, IO& io){
-        this->keyboardTask = scheduler.every(50, [io](arc::Scheduler& scheduler) {
+        this->keyboardTask = scheduler.every(50, [io]() {
             io.keyboard.tick();
         });
+        io.keyboard.onKeyUp[Next] = [](const arc::KeyEvent& keyEvent) {
+            //stateMachine.toState(FIRST);
+        };
     }
     void leave(arc::Scheduler& scheduler, IO& io){
         safeClean(this->keyboardTask);
@@ -36,7 +46,8 @@ public:
 };
 
 
-arc::StateMachine<1,IO&> stateMachine(scheduler, io);
+arc::TaskNode * blinkTask;
+
 
 void setup() {
     Serial.begin(9600);

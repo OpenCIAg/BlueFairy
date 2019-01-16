@@ -5,7 +5,7 @@ int LED_VALUE = 0;
 
 arc::Scheduler scheduler;
 
-void toggleLed(arc::Scheduler &scheduler){
+void toggleLed(){
     LED_VALUE = (LED_VALUE + 1) % 2;
     digitalWrite(LED_PIN, LED_VALUE);
 }

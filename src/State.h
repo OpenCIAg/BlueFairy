@@ -14,6 +14,22 @@ namespace arc {
         virtual ~State(){};
     };
 
+    template<typename IO, typename EF, typename LF>
+    class GenericState {
+    public:
+        GenericState(EF enterFunction, LF leaveFunction) : enterFunction(enterFunction), leaveFunction(leaveFunction) {}
+        void enter(Scheduler& scheduler, IO io) { this->enterFunction(scheduler,io); }
+        void leave(Scheduler& scheduler, IO io) { this->leaveFunction(scheduler,io); }
+    protected:
+        EF enterFunction;
+        LF leaveFunction;
+    };
+
+    template<typename IO, typename EF, typename LF>
+    GenericState<IO, EF,LF>* makeState(EF enterFunction, LF leaveFunction) {
+        return new GenericState<IO,EF,LF>(enterFunction, leaveFunction);
+    }
+
     template<typename IO>
     class NullState : public State<IO> {
         void enter(Scheduler&,IO){};
