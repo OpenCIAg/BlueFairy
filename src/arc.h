@@ -1,18 +1,20 @@
 #ifndef __ARC__
 #define __ARC__
 
-template<typename T>
-void clean(T *& pointer) {
-    delete pointer;
-    pointer = NULL;
-}
-
-template<typename T>
-void safeClean(T *& pointer) {
-    if(pointer == NULL){
-        return;
+namespace arc {
+    template<typename T>
+    void clean(T *& pointer) {
+        delete pointer;
+        pointer = NULL;
     }
-    clean(pointer);
+
+    template<typename T>
+    void safeClean(T *& pointer) {
+        if(pointer == NULL){
+            return;
+        }
+        clean(pointer);
+    }
 }
 
 #endif

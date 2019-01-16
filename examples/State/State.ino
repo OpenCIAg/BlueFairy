@@ -5,18 +5,7 @@
 
 arc::Scheduler scheduler;
 arc::Keyboard<2> keyboard((byte[]){0, 1});
-
-typedef struct InputOutput {
-    Stream& serial;
-    arc::Keyboard<2>& keyboard;
-} IO;
-
-IO io = {
-    .serial=Serial,
-    .keyboard=keyboard
-};
-
-arc::StateMachine<1,IO&> stateMachine(scheduler, io);
+arc::StateMachine<2> stateMachine;
 
 enum Button {
     Next = 0,
@@ -28,31 +17,36 @@ enum AppState {
     FIRST
 };
 
-class InitState : public arc::State<IO&> {
-protected:
-    arc::TaskNode * keyboardTask = NULL;
+class InitState : public arc::State {
 public:
-    void enter(arc::Scheduler& scheduler, IO& io){
-        this->keyboardTask = scheduler.every(50, [io]() {
-            io.keyboard.tick();
-        });
-        io.keyboard.onKeyUp[Next] = [](const arc::KeyEvent& keyEvent) {
-            //stateMachine.toState(FIRST);
+    void enter(){
+        keyboard.onKeyUp[Next] = [](const arc::KeyEvent& keyEvent) {
+            stateMachine.toState(FIRST);
         };
     }
-    void leave(arc::Scheduler& scheduler, IO& io){
-        safeClean(this->keyboardTask);
+    void leave(){
+        keyboard.clear();
     }
 };
 
-
-arc::TaskNode * blinkTask;
-
-
 void setup() {
     Serial.begin(9600);
-    stateMachine[AppState::INIT] = new InitState();
+    stateMachine[AppState::INIT] = new arc::DebugState<InitState>("INIT",Serial,InitState());
+    stateMachine[AppState::FIRST] = new arc::DebugState<arc::GenericState<>>("FIRST",Serial, arc::makeState(
+        (arc::runnable)[](){
+            keyboard.onKeyUp[Next] = [](const arc::KeyEvent& keyEvent) {
+                stateMachine.toState(FIRST);
+            };
+            keyboard.onKeyUp[Prev] = [](const arc::KeyEvent& keyEvent) {
+                stateMachine.toState(INIT);
+            };
+        },
+        (arc::runnable)[](){
+            keyboard.clear();
+        }
+    ));
     stateMachine.toState(AppState::INIT);
+    scheduler.every(50,keyboard);
 }
 
 

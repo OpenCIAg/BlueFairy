@@ -42,12 +42,23 @@ namespace arc {
         key_action_t onHoldDown[SIZE];
         void edgeTrigger(const Edge* const edges);
         void operator()(const Edge* const edges);
+        void operator()(){ this->tick(); }
+        void clear();
+        bool isActive() const { return this->active; }
+        void turnOff();
+        void turnOn();
     protected:
+        bool active = true;
         EdgeDetector<SIZE, Keyboard&> edgeDetector;
     };
 
     template<size_t SIZE>
     Keyboard<SIZE>::Keyboard(const byte* const pins): edgeDetector(pins,*this){
+        this->clear();
+    }
+
+    template<size_t SIZE>
+    void Keyboard<SIZE>::clear() {
         for(size_t i =0;i<SIZE;++i){
             this->onKeyDown[i] = noop;
             this->onKeyUp[i] = noop;
@@ -55,6 +66,17 @@ namespace arc {
             this->holdTicks[i] = 0;
             this->lastChange[i] = 0;
         }
+    }
+
+    template<size_t SIZE>
+    void Keyboard<SIZE>::turnOff() {
+        this->active = false;
+        this->clear();
+    }
+
+    template<size_t SIZE>
+    void Keyboard<SIZE>::turnOn() {
+        this->active = true;
     }
 
     template<size_t SIZE>
@@ -91,6 +113,9 @@ namespace arc {
 
     template<size_t SIZE>
     void Keyboard<SIZE>::tick() {
+        if(!this->active){
+            return;
+        }
         for(size_t i = 0; i < SIZE; ++i){
             this->holdTicks[i] += 1;
         }

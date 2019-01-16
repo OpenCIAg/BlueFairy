@@ -28,6 +28,7 @@ namespace arc {
 
     class TaskNode {
     protected:
+        bool canceled;
         Scheduler& scheduler;
         unsigned long when;
         TaskNode * next;
@@ -36,6 +37,7 @@ namespace arc {
         TaskNode(Scheduler& scheduler);
         virtual bool run(){};
         virtual ~TaskNode();
+        virtual void cancel();
     };
 
     class Scheduler {

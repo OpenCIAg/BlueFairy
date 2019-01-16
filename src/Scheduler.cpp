@@ -1,5 +1,5 @@
 #include "Scheduler.h"
-
+#include "iostream"
 
 
 namespace arc {
@@ -7,10 +7,14 @@ namespace arc {
     TaskNode::TaskNode(Scheduler& scheduler): scheduler(scheduler) {
         this->when = 0;
         this->next = NULL;
+        this->canceled = false;
+    }
+
+    void TaskNode::cancel() {
+        this->canceled = true;
     }
 
     TaskNode::~TaskNode() {
-        this->scheduler.removeTask(this);
     }
 
     Scheduler::~Scheduler() {
@@ -22,7 +26,7 @@ namespace arc {
         }
     }
 
-    unsigned long Scheduler::tick() {
+    unsigned long Scheduler::tick() {        
         unsigned long currentTime = millis();
         while(this->headNode.next != NULL) {
             if(this->headNode.next->when > currentTime) {
@@ -30,7 +34,11 @@ namespace arc {
             }
             TaskNode * taskNode = this->headNode.next;
             this->headNode.next = taskNode->next;
-            if(taskNode->run()){
+            bool deleteTask = taskNode->canceled;
+            if(!taskNode->canceled){
+                deleteTask |= taskNode->run();
+            }
+            if(deleteTask){
                 delete taskNode;
             }
             currentTime = millis();

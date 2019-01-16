@@ -1,84 +1,112 @@
 #ifndef __ARC_STATE__
 #define __ARC_STATE__
 
+#include "arc.h"
+#include "Arduino.h"
 #include "Scheduler.h"
 
 
 namespace arc {
 
-    template<typename IO>
+    typedef void (*runnable)();
+
     class State {
     public:
-        virtual void enter(Scheduler& scheduler, IO io) =0;
-        virtual void leave(Scheduler& scheduler, IO io) = 0;
+        virtual void enter() =0;
+        virtual void leave() = 0;
         virtual ~State(){};
     };
 
-    template<typename IO, typename EF, typename LF>
+    template<typename S>
+    class DebugState : public State{
+    public:
+        DebugState(const char * const name, Stream& output, S state ) : name(name), output(output), state(state) {
+
+        }
+
+        void enter() {
+            this->output.print("Entering at state ");
+            this->output.println(this->name);
+            this->state.enter();
+            this->output.print("Entered at state ");
+            this->output.println(this->name);
+        }
+
+        void leave(){
+            this->output.print("Leaving at state ");
+            this->output.println(this->name);
+            this->state.leave();
+            this->output.print("Left state ");
+            this->output.println(this->name);
+        }
+
+    protected:
+        const char * const name;
+        Stream& output;
+        S state;
+    };
+
+    template<typename EF =runnable, typename LF=runnable>
     class GenericState {
     public:
         GenericState(EF enterFunction, LF leaveFunction) : enterFunction(enterFunction), leaveFunction(leaveFunction) {}
-        void enter(Scheduler& scheduler, IO io) { this->enterFunction(scheduler,io); }
-        void leave(Scheduler& scheduler, IO io) { this->leaveFunction(scheduler,io); }
+        void enter() { this->enterFunction(); }
+        void leave() { this->leaveFunction(); }
     protected:
         EF enterFunction;
         LF leaveFunction;
     };
 
-    template<typename IO, typename EF, typename LF>
-    GenericState<IO, EF,LF>* makeState(EF enterFunction, LF leaveFunction) {
-        return new GenericState<IO,EF,LF>(enterFunction, leaveFunction);
+    template<typename EF=runnable, typename LF=runnable>
+    GenericState<EF,LF> makeState(EF enterFunction, LF leaveFunction) {
+        return GenericState<EF,LF>(enterFunction, leaveFunction);
     }
 
-    template<typename IO>
-    class NullState : public State<IO> {
-        void enter(Scheduler&,IO){};
-        void leave(Scheduler&,IO){};
+    class NullState : public State {
+        void enter(){};
+        void leave(){};
     };
 
-    template<size_t SIZE, typename IO>
+    template<size_t SIZE>
     class StateMachine {
     public:
-        StateMachine(Scheduler&,IO);
+        StateMachine();
         ~StateMachine();
         void toState(size_t stateIndex);
-        State<IO>*& operator[](size_t stateIndex);
+        State *& operator[](size_t stateIndex);
     protected:
-        NullState<IO> nullState;
-        Scheduler& scheduler;
-        IO io;
-        State<IO> * currentState;
-        State<IO>* states[SIZE];
+        NullState nullState;
+        State* currentState;
+        State* states[SIZE];
     };
 
-    template<size_t SIZE, typename IO>
-    StateMachine<SIZE, IO>::StateMachine(Scheduler& scheduler, IO io) : scheduler(scheduler), io(io) {
+    template<size_t SIZE>
+    StateMachine<SIZE>::StateMachine(){
         this->currentState = &this->nullState;
         for(size_t i = 0; i > SIZE ; ++i) {
             this->states[i] = NULL;
         }
     }
 
-    template<size_t SIZE, typename IO>
-    StateMachine<SIZE, IO>::~StateMachine(){
+    template<size_t SIZE>
+    StateMachine<SIZE>::~StateMachine(){
         for(size_t i = 0; i > SIZE ; ++i) {
             safeClean(this->states[i]);
         }
     }
 
-    template<size_t SIZE, typename IO>
-    void StateMachine<SIZE, IO>::toState(size_t stateIndex) {
-        this->currentState->leave(this->scheduler, this->io);
+    template<size_t SIZE>
+    void StateMachine<SIZE>::toState(size_t stateIndex) {
+        this->currentState->leave();
         this->currentState = this->states[stateIndex];
-        this->currentState->enter(this->scheduler, this->io);
+        this->currentState->enter();
     }
 
-    template<size_t SIZE, typename IO>
-    State<IO>*& StateMachine<SIZE,IO>::operator[](size_t stateIndex) {
+    template<size_t SIZE>
+    State *& StateMachine<SIZE>::operator[](size_t stateIndex) {
         return this->states[stateIndex];
     }
 
 }
-
 
 #endif
