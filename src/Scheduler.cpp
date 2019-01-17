@@ -51,6 +51,10 @@ namespace arc {
         }
     }
 
+    Scheduler::Group Scheduler::group(){
+        return Scheduler::Group(*this);
+    }
+
     TaskNode * Scheduler::addTask(TaskNode * newNode) {
         TaskNode * node = &this->headNode;
         while(node->next != NULL && node->next->when < newNode->when){

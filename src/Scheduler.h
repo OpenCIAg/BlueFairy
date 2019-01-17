@@ -2,6 +2,7 @@
 #define __ARC_SCHEDULER__
 
 #include "Arduino.h"
+#include "List.h"
 
 namespace arc {
 
@@ -42,6 +43,8 @@ namespace arc {
 
     class Scheduler {
     public:
+        class Group;
+
         unsigned long tick();
         void loop();
         Scheduler() : headNode(*this) {};
@@ -77,12 +80,60 @@ namespace arc {
             return this->addTask(node);
         }
 
+        Group group();
+
         void debug(Stream& stream);
         virtual ~Scheduler();
 
 
         TaskNode* addTask(TaskNode * taskNode);
         bool removeTask(TaskNode * taskNode);
+
+        class Group {
+        public:
+            Group& cancel() {
+                List<TaskNode*>::Iterator tasks = this->tasks.iterator();
+                while(tasks.hasNext()){
+                    tasks.next()->cancel();
+                }
+                this->tasks.clear();
+                return *this;
+            }
+
+            Group(Scheduler& scheduler):scheduler(scheduler){};
+
+            template<typename T>
+            Group& timeout(unsigned int msWait, T task) {
+                this->tasks.add(scheduler.timeout(msWait,task));
+                return *this;
+            }
+
+            template<typename T>
+            Group&  every(unsigned int msInterval, T task) {
+                return this->every(msInterval, msInterval, task);
+            }
+
+            template<typename T>
+            Group& every(unsigned int firstInterval, unsigned int msInterval, T task) {
+                this->tasks.add(scheduler.every(firstInterval, msInterval, task));
+                return *this;
+            }
+
+            template<typename T>
+            Group& repeat(unsigned int times, unsigned int msInterval, T task) {
+                return this->repeat(times, msInterval, msInterval, task);
+            }
+
+            template<typename T>
+            Group& repeat(unsigned int times, unsigned int firstInterval, unsigned int msInterval, T task) {
+                this->tasks.add(scheduler.repeat(times, firstInterval,msInterval,task));
+                return *this;
+            }
+
+        protected:
+            Scheduler& scheduler;
+            List<TaskNode*> tasks;
+        };
 
     protected:
         TaskNode headNode;

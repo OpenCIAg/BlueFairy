@@ -33,7 +33,7 @@ namespace arc {
         }
 
         void leave(){
-            this->output.print("Leaving at state ");
+            this->output.print("Leaving the state ");
             this->output.println(this->name);
             this->state.leave();
             this->output.print("Left state ");

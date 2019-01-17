@@ -3,9 +3,18 @@
 #include "Keyboard.h"
 #include "arc.h"
 
+const int LED_PIN = 13;
+int LED_VALUE = 0;
+
+void toggleLed(){
+    LED_VALUE = (LED_VALUE + 1) % 2;
+    digitalWrite(LED_PIN, LED_VALUE);
+}
+
 arc::Scheduler scheduler;
 arc::Keyboard<2> keyboard((byte[]){0, 1});
 arc::StateMachine<2> stateMachine;
+arc::Scheduler::Group blinkAnnimation =  scheduler.group();
 
 enum Button {
     Next = 0,
@@ -17,15 +26,21 @@ enum AppState {
     FIRST
 };
 
+
 class InitState : public arc::State {
 public:
     void enter(){
+        blinkAnnimation
+            .every(500, toggleLed)
+            .every( 250, 500, toggleLed);
         keyboard.onKeyUp[Next] = [](const arc::KeyEvent& keyEvent) {
             stateMachine.toState(FIRST);
         };
     }
+
     void leave(){
         keyboard.clear();
+        blinkAnnimation.cancel();
     }
 };
 
@@ -34,6 +49,9 @@ void setup() {
     stateMachine[AppState::INIT] = new arc::DebugState<InitState>("INIT",Serial,InitState());
     stateMachine[AppState::FIRST] = new arc::DebugState<arc::GenericState<>>("FIRST",Serial, arc::makeState(
         (arc::runnable)[](){
+            blinkAnnimation
+                .every(250, toggleLed)
+                .every( 125, 250, toggleLed);
             keyboard.onKeyUp[Next] = [](const arc::KeyEvent& keyEvent) {
                 stateMachine.toState(FIRST);
             };
@@ -43,10 +61,11 @@ void setup() {
         },
         (arc::runnable)[](){
             keyboard.clear();
+            blinkAnnimation.cancel();
         }
     ));
     stateMachine.toState(AppState::INIT);
-    scheduler.every(50,keyboard);
+    scheduler.every(2000,keyboard);
 }
 
 
