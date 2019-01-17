@@ -50,35 +50,19 @@ namespace arc {
         Scheduler() : headNode(*this) {};
 
         template<typename T>
-        TaskNode* timeout(unsigned int msWait, T task) {
-            unsigned long doWhen = millis() + msWait;
-            TaskNode * node  = new SingleTaskNode<T>(*this, doWhen, task);
-            return this->addTask(node);
-        }
+        TaskNode* timeout(unsigned int msWait, T task);
 
         template<typename T>
-        TaskNode* every(unsigned int msInterval, T task) {
-            return this->every(msInterval, msInterval, task);
-        }
+        TaskNode* every(unsigned int msInterval, T task);
+    
+        template<typename T>
+        TaskNode* every(unsigned int firstInterval, unsigned int msInterval, T task);
 
         template<typename T>
-        TaskNode* every(unsigned int firstInterval, unsigned int msInterval, T task) {
-            unsigned long doWhen = millis() + firstInterval;
-            TaskNode * node = new PeriodicTaskNode<T>(*this, doWhen, msInterval, task);
-            return this->addTask(node);
-        }
+        TaskNode* repeat(unsigned int times, unsigned int msInterval, T task);
 
         template<typename T>
-        TaskNode* repeat(unsigned int times, unsigned int msInterval, T task) {
-            return this->repeat(times, msInterval, msInterval, task);
-        }
-
-        template<typename T>
-        TaskNode* repeat(unsigned int times, unsigned int firstInterval, unsigned int msInterval, T task) {
-            unsigned long doWhen = millis() + firstInterval;
-            TaskNode * node = new ExpirableTaskNode<T>(*this, times, doWhen, msInterval, task);
-            return this->addTask(node);
-        }
+        TaskNode* repeat(unsigned int times, unsigned int firstInterval, unsigned int msInterval, T task);
 
         Group group();
 
@@ -91,44 +75,23 @@ namespace arc {
 
         class Group {
         public:
-            Group& cancel() {
-                List<TaskNode*>::Iterator tasks = this->tasks.iterator();
-                while(tasks.hasNext()){
-                    tasks.next()->cancel();
-                }
-                this->tasks.clear();
-                return *this;
-            }
-
-            Group(Scheduler& scheduler):scheduler(scheduler){};
+            Group(Scheduler& scheduler);
+            Group& cancel();
 
             template<typename T>
-            Group& timeout(unsigned int msWait, T task) {
-                this->tasks.add(scheduler.timeout(msWait,task));
-                return *this;
-            }
+            Group& timeout(unsigned int msWait, T task);
 
             template<typename T>
-            Group&  every(unsigned int msInterval, T task) {
-                return this->every(msInterval, msInterval, task);
-            }
+            Group&  every(unsigned int msInterval, T task);
 
             template<typename T>
-            Group& every(unsigned int firstInterval, unsigned int msInterval, T task) {
-                this->tasks.add(scheduler.every(firstInterval, msInterval, task));
-                return *this;
-            }
+            Group& every(unsigned int firstInterval, unsigned int msInterval, T task);
 
             template<typename T>
-            Group& repeat(unsigned int times, unsigned int msInterval, T task) {
-                return this->repeat(times, msInterval, msInterval, task);
-            }
+            Group& repeat(unsigned int times, unsigned int msInterval, T task);
 
             template<typename T>
-            Group& repeat(unsigned int times, unsigned int firstInterval, unsigned int msInterval, T task) {
-                this->tasks.add(scheduler.repeat(times, firstInterval,msInterval,task));
-                return *this;
-            }
+            Group& repeat(unsigned int times, unsigned int firstInterval, unsigned int msInterval, T task);
 
         protected:
             Scheduler& scheduler;
@@ -138,6 +101,65 @@ namespace arc {
     protected:
         TaskNode headNode;
     };
+
+    template<typename T>
+    TaskNode* Scheduler::timeout(unsigned int msWait, T task) {
+        unsigned long doWhen = millis() + msWait;
+        TaskNode * node  = new SingleTaskNode<T>(*this, doWhen, task);
+        return this->addTask(node);
+    }
+
+    template<typename T>
+    TaskNode* Scheduler::every(unsigned int msInterval, T task) {
+        return this->every(msInterval, msInterval, task);
+    }
+
+    template<typename T>
+    TaskNode* Scheduler::every(unsigned int firstInterval, unsigned int msInterval, T task) {
+        unsigned long doWhen = millis() + firstInterval;
+        TaskNode * node = new PeriodicTaskNode<T>(*this, doWhen, msInterval, task);
+        return this->addTask(node);
+    }
+
+    template<typename T>
+    TaskNode* Scheduler::repeat(unsigned int times, unsigned int msInterval, T task) {
+        return this->repeat(times, msInterval, msInterval, task);
+    }
+
+    template<typename T>
+    TaskNode* Scheduler::repeat(unsigned int times, unsigned int firstInterval, unsigned int msInterval, T task) {
+        unsigned long doWhen = millis() + firstInterval;
+        TaskNode * node = new ExpirableTaskNode<T>(*this, times, doWhen, msInterval, task);
+        return this->addTask(node);
+    }
+
+    template<typename T>
+    Scheduler::Group& Scheduler::Group::timeout(unsigned int msWait, T task) {
+        this->tasks.add(scheduler.timeout(msWait,task));
+        return *this;
+    }
+
+    template<typename T>
+    Scheduler::Group&  Scheduler::Group::every(unsigned int msInterval, T task) {
+        return this->every(msInterval, msInterval, task);
+    }
+
+    template<typename T>
+    Scheduler::Group& Scheduler::Group::every(unsigned int firstInterval, unsigned int msInterval, T task) {
+        this->tasks.add(scheduler.every(firstInterval, msInterval, task));
+        return *this;
+    }
+
+    template<typename T>
+    Scheduler::Group& Scheduler::Group::repeat(unsigned int times, unsigned int msInterval, T task) {
+        return this->repeat(times, msInterval, msInterval, task);
+    }
+
+    template<typename T>
+    Scheduler::Group& Scheduler::Group::repeat(unsigned int times, unsigned int firstInterval, unsigned int msInterval, T task) {
+        this->tasks.add(scheduler.repeat(times, firstInterval,msInterval,task));
+        return *this;
+    }
 
 
     template<typename A>

@@ -55,6 +55,18 @@ namespace arc {
         return Scheduler::Group(*this);
     }
 
+    Scheduler::Group::Group(Scheduler& scheduler) : scheduler(scheduler){
+    }
+
+    Scheduler::Group& Scheduler::Group::cancel() {
+        List<TaskNode*>::Iterator tasks = this->tasks.iterator();
+        while(tasks.hasNext()){
+            tasks.next()->cancel();
+        }
+        this->tasks.clear();
+        return *this;
+    }
+
     TaskNode * Scheduler::addTask(TaskNode * newNode) {
         TaskNode * node = &this->headNode;
         while(node->next != NULL && node->next->when < newNode->when){
