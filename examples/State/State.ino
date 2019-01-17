@@ -29,6 +29,8 @@ enum AppState {
 
 class InitState : public arc::State {
 public:
+    InitState(){};
+
     void enter(){
         blinkAnnimation
             .every(500, toggleLed)
@@ -42,11 +44,15 @@ public:
         keyboard.clear();
         blinkAnnimation.cancel();
     }
+private:
+    InitState(const InitState& orig);
 };
+
+InitState initState;
 
 void setup() {
     Serial.begin(9600);
-    stateMachine[AppState::INIT] = new arc::DebugState<InitState>("INIT",Serial,InitState());
+    stateMachine[AppState::INIT] = new arc::DebugState<InitState&>("INIT",Serial, initState);
     stateMachine[AppState::FIRST] = new arc::DebugState<arc::GenericState<>>("FIRST",Serial, arc::makeState(
         (arc::runnable)[](){
             blinkAnnimation
@@ -64,8 +70,8 @@ void setup() {
             blinkAnnimation.cancel();
         }
     ));
+    scheduler.every(2000,[](){ keyboard.tick(); });
     stateMachine.toState(AppState::INIT);
-    scheduler.every(2000,keyboard);
 }
 
 

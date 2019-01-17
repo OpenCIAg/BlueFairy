@@ -44,6 +44,8 @@ namespace arc {
         const char * const name;
         Stream& output;
         S state;
+    private:
+        DebugState(const DebugState*);
     };
 
     template<typename EF =runnable, typename LF=runnable>

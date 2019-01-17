@@ -42,7 +42,6 @@ namespace arc {
         key_action_t onHoldDown[SIZE];
         void edgeTrigger(const Edge* const edges);
         void operator()(const Edge* const edges);
-        void operator()(){ this->tick(); }
         void clear();
         bool isActive() const { return this->active; }
         void turnOff();
@@ -50,6 +49,8 @@ namespace arc {
     protected:
         bool active = true;
         EdgeDetector<SIZE, Keyboard&> edgeDetector;
+    private:
+        Keyboard(const Keyboard<SIZE>&);
     };
 
     template<size_t SIZE>

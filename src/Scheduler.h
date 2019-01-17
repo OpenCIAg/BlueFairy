@@ -28,6 +28,8 @@ namespace arc {
 
 
     class TaskNode {
+    private:
+        TaskNode(const TaskNode&);
     protected:
         bool canceled;
         Scheduler& scheduler;
@@ -100,6 +102,8 @@ namespace arc {
 
     protected:
         TaskNode headNode;
+    private:
+        Scheduler(const Scheduler&);
     };
 
     template<typename T>
