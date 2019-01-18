@@ -12,23 +12,58 @@ namespace arc {
         unsigned long lastChange;
         bool value;
 
-        KeyEvent(size_t key, Edge edge, unsigned int holdTicks, unsigned long lastChange, bool value) {
-            this->key = key;
-            this->edge = edge;
-            this->holdTicks = holdTicks;
-            this->lastChange = lastChange;
-            this->value = value;
-        }
+        KeyEvent(size_t key, Edge edge, unsigned int holdTicks, unsigned long lastChange, bool value);
 
-        unsigned int holdTime() const {
-            return millis() - this->lastChange;
-        }
+        unsigned int holdTime() const;
 
     };
 
-    typedef void (*key_action_t)(const KeyEvent&);
-    key_action_t noop = [](const KeyEvent& event){};
+    class KeyAction {
+    public:
+        virtual void perform(const KeyEvent&) =0;
+        virtual ~KeyAction() {};
+    };
 
+    class NullAction : public KeyAction {
+    public:
+        void perform(const KeyEvent&);
+    };
+
+    template<typename T>
+    class TemplateKeyAction : public KeyAction {
+    protected:
+        T onPerform;
+    public:
+        TemplateKeyAction(T onPerform);
+        void perform(const KeyEvent& keyEvent);
+    };
+
+    template<typename T>
+    TemplateKeyAction<T>::TemplateKeyAction(T onPerform) : onPerform(onPerform) {
+
+    }
+
+    template<typename T>
+    void TemplateKeyAction<T>::perform(const KeyEvent& keyEvent){
+        this->onPerform(keyEvent);
+    }
+
+    class KeyActionHolder {
+    public:
+        KeyActionHolder();
+        void operator()(const KeyEvent&);
+        template<typename T>
+        KeyActionHolder& operator=(T action);
+    protected:
+        KeyAction * keyAction;
+    };
+
+    template<typename T>
+    KeyActionHolder&  KeyActionHolder::operator=(T action){
+        delete this->keyAction;
+        this->keyAction = new TemplateKeyAction<T>(action);
+        return *this;
+    }
 
     template<size_t SIZE>
     class Keyboard {
@@ -37,9 +72,9 @@ namespace arc {
         void tick();
         unsigned long lastChange[SIZE];
         unsigned int holdTicks[SIZE];
-        key_action_t onKeyDown[SIZE];
-        key_action_t onKeyUp[SIZE];
-        key_action_t onHoldDown[SIZE];
+        KeyActionHolder onKeyDown[SIZE];
+        KeyActionHolder onKeyUp[SIZE];
+        KeyActionHolder onHoldDown[SIZE];
         void edgeTrigger(const Edge* const edges);
         void operator()(const Edge* const edges);
         void clear();
@@ -61,9 +96,6 @@ namespace arc {
     template<size_t SIZE>
     void Keyboard<SIZE>::clear() {
         for(size_t i =0;i<SIZE;++i){
-            this->onKeyDown[i] = noop;
-            this->onKeyUp[i] = noop;
-            this->onHoldDown[i] = noop;
             this->holdTicks[i] = 0;
             this->lastChange[i] = 0;
         }
