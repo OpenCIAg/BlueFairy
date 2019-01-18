@@ -51,6 +51,8 @@ namespace arc {
     class KeyActionHolder {
     public:
         KeyActionHolder();
+        ~KeyActionHolder();
+        void clear();
         void operator()(const KeyEvent&);
         template<typename T>
         KeyActionHolder& operator=(T action);
@@ -60,7 +62,7 @@ namespace arc {
 
     template<typename T>
     KeyActionHolder&  KeyActionHolder::operator=(T action){
-        delete this->keyAction;
+        this->clear();
         this->keyAction = new TemplateKeyAction<T>(action);
         return *this;
     }
@@ -98,6 +100,9 @@ namespace arc {
         for(size_t i =0;i<SIZE;++i){
             this->holdTicks[i] = 0;
             this->lastChange[i] = 0;
+            this->onKeyDown[i].clear();
+            this->onKeyUp[i].clear();
+            this->onHoldDown[i].clear();
         }
     }
 
