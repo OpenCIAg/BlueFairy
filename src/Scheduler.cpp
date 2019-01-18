@@ -8,12 +8,17 @@ namespace arc {
         this->canceled = false;
     }
 
+
+    TaskNode::~TaskNode() {
+    }
+
     void TaskNode::cancel() {
         this->canceled = true;
     }
 
-    TaskNode::~TaskNode() {
-    }
+    bool TaskNode::run() {
+        return false;
+    }    
 
     Scheduler::~Scheduler() {
         TaskNode * taskNode = this->headNode.next;

@@ -38,7 +38,7 @@ namespace arc {
     public:
         friend Scheduler;
         TaskNode(Scheduler& scheduler);
-        virtual bool run(){};
+        virtual bool run();
         virtual ~TaskNode();
         virtual void cancel();
     };

@@ -29,8 +29,6 @@ enum AppState {
 
 class InitState : public arc::State {
 public:
-    InitState(){};
-
     void enter(){
         blinkAnnimation
             .every(500, toggleLed)
@@ -44,8 +42,6 @@ public:
         keyboard.clear();
         blinkAnnimation.cancel();
     }
-private:
-    InitState(const InitState& orig);
 };
 
 InitState initState;
