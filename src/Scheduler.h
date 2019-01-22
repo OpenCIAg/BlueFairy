@@ -17,16 +17,6 @@ namespace ciag {
         ~Task();
     };
 
-    template<typename F>
-    class GenericTask {
-    public:
-        GenericTask(F function) : function(function) {};
-        void operator()() { this->function(); }
-    protected:
-        F function;
-    };
-
-
     class TaskNode {
     private:
         TaskNode(const TaskNode&);
