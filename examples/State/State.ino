@@ -48,8 +48,8 @@ InitState initState;
 
 void setup() {
     Serial.begin(9600);
-    stateMachine[AppState::INIT] = new ciag::DebugState<InitState&>("INIT",Serial, initState);
-    stateMachine[AppState::FIRST] = new ciag::DebugState<ciag::GenericState<>>("FIRST",Serial, ciag::makeState(
+    stateMachine[AppState::INIT] = new ciag::DebugStateDecorator<InitState&>("INIT",Serial, initState);
+    stateMachine[AppState::FIRST] = new ciag::DebugStateDecorator<ciag::GenericState<>>("FIRST",Serial, ciag::makeState(
         (ciag::runnable)[](){
             blinkAnnimation
                 .every(250, toggleLed)

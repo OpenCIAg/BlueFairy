@@ -1,0 +1,35 @@
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+#scheduler
+Scheduler	KEYWORD1
+TaskNode	KEYWORD1
+#state machine
+StateMachine	KEYWORD1
+DebugStateDecorator	KEYWORD1
+State	KEYWORD1
+#keyboard
+Keyboard	KEYWORD1
+KeyEvent	KEYWORD1
+#others
+List	KEYWORD1
+EdgeDetector	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+#scheduler
+timeout	KEYWORD2
+every	KEYWORD2
+repeat	KEYWORD2
+group	KEYWORD2
+cancel	KEYWORD2
+#state machine
+toState	KEYWORD2
+#keyboard
+tick	KEYWORD2
+clear	KEYWORD2
+holdTime	KEYWORD2
+turnOff	KEYWORD2
+turnOn	KEYWORD2
+

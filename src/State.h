@@ -18,9 +18,9 @@ namespace ciag {
     };
 
     template<typename S>
-    class DebugState : public State{
+    class DebugStateDecorator : public State{
     public:
-        DebugState(const char * const name, Stream& output, S state ) : name(name), output(output), state(state) {
+        DebugStateDecorator(const char * const name, Stream& output, S state ) : name(name), output(output), state(state) {
 
         }
 
@@ -45,7 +45,7 @@ namespace ciag {
         Stream& output;
         S state;
     private:
-        DebugState(const DebugState*);
+        DebugStateDecorator(const DebugStateDecorator*);
     };
 
     template<typename EF =runnable, typename LF=runnable>
