@@ -1,6 +1,6 @@
 #include "Scheduler.h"
 
-namespace arc {
+namespace ciag {
 
     TaskNode::TaskNode(Scheduler& scheduler): scheduler(scheduler) {
         this->when = 0;

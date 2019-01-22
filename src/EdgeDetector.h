@@ -1,9 +1,9 @@
-#ifndef __ARC__EDGE_DETECTOR__
-#define __ARC__EDGE_DETECTOR__
+#ifndef __CIAG__EDGE_DETECTOR__
+#define __CIAG__EDGE_DETECTOR__
 
 #include "Arduino.h"
 
-namespace arc {
+namespace ciag {
 
     typedef unsigned char byte;
 

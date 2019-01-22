@@ -1,8 +1,8 @@
-#ifndef __ARC__KEYBOARD__
-#define __ARC__KEYBOARD__
+#ifndef __CIAG__KEYBOARD__
+#define __CIAG__KEYBOARD__
 #include "EdgeDetector.h"
 
-namespace arc {
+namespace ciag {
 
     class KeyEvent {
     public:

@@ -1,7 +1,7 @@
 #include "State.h"
 #include "Scheduler.h"
 #include "Keyboard.h"
-#include "arc.h"
+#include "ciag.h"
 
 const int LED_PIN = 13;
 int LED_VALUE = 0;
@@ -11,10 +11,10 @@ void toggleLed(){
     digitalWrite(LED_PIN, LED_VALUE);
 }
 
-arc::Scheduler scheduler;
-arc::Keyboard<2> keyboard((byte[]){0, 1});
-arc::StateMachine<2> stateMachine;
-arc::Scheduler::Group blinkAnnimation =  scheduler.group();
+ciag::Scheduler scheduler;
+ciag::Keyboard<2> keyboard((byte[]){0, 1});
+ciag::StateMachine<2> stateMachine;
+ciag::Scheduler::Group blinkAnnimation =  scheduler.group();
 
 enum Button {
     Next = 0,
@@ -27,13 +27,13 @@ enum AppState {
 };
 
 
-class InitState : public arc::State {
+class InitState : public ciag::State {
 public:
     void enter(){
         blinkAnnimation
             .every(500, toggleLed)
             .every( 250, 500, toggleLed);
-        keyboard.onKeyUp[Next] = [](const arc::KeyEvent& keyEvent) {
+        keyboard.onKeyUp[Next] = [](const ciag::KeyEvent& keyEvent) {
             stateMachine.toState(FIRST);
         };
     }
@@ -48,20 +48,20 @@ InitState initState;
 
 void setup() {
     Serial.begin(9600);
-    stateMachine[AppState::INIT] = new arc::DebugState<InitState&>("INIT",Serial, initState);
-    stateMachine[AppState::FIRST] = new arc::DebugState<arc::GenericState<>>("FIRST",Serial, arc::makeState(
-        (arc::runnable)[](){
+    stateMachine[AppState::INIT] = new ciag::DebugState<InitState&>("INIT",Serial, initState);
+    stateMachine[AppState::FIRST] = new ciag::DebugState<ciag::GenericState<>>("FIRST",Serial, ciag::makeState(
+        (ciag::runnable)[](){
             blinkAnnimation
                 .every(250, toggleLed)
                 .every( 125, 250, toggleLed);
-            keyboard.onKeyUp[Next] = [](const arc::KeyEvent& keyEvent) {
+            keyboard.onKeyUp[Next] = [](const ciag::KeyEvent& keyEvent) {
                 stateMachine.toState(FIRST);
             };
-            keyboard.onKeyUp[Prev] = [](const arc::KeyEvent& keyEvent) {
+            keyboard.onKeyUp[Prev] = [](const ciag::KeyEvent& keyEvent) {
                 stateMachine.toState(INIT);
             };
         },
-        (arc::runnable)[](){
+        (ciag::runnable)[](){
             keyboard.clear();
             blinkAnnimation.cancel();
         }

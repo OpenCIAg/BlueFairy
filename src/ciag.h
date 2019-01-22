@@ -1,7 +1,7 @@
-#ifndef __ARC__
-#define __ARC__
+#ifndef __CIAG__
+#define __CIAG__
 
-namespace arc {
+namespace ciag {
     template<typename T>
     void clean(T *& pointer) {
         delete pointer;

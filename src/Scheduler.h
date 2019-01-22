@@ -1,10 +1,10 @@
-#ifndef __ARC_SCHEDULER__
-#define __ARC_SCHEDULER__
+#ifndef __CIAG_SCHEDULER__
+#define __CIAG_SCHEDULER__
 
 #include "Arduino.h"
 #include "List.h"
 
-namespace arc {
+namespace ciag {
 
     class Scheduler;
     template<typename A> class SingleTaskNode;

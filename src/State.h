@@ -1,12 +1,12 @@
-#ifndef __ARC_STATE__
-#define __ARC_STATE__
+#ifndef __CIAG_STATE__
+#define __CIAG_STATE__
 
-#include "arc.h"
+#include "ciag.h"
 #include "Arduino.h"
 #include "Scheduler.h"
 
 
-namespace arc {
+namespace ciag {
 
     typedef void (*runnable)();
 

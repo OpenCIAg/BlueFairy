@@ -6,7 +6,7 @@
 #include <iostream>
 
 
-using namespace arc;
+using namespace ciag;
 
 
 int counter = 1;
