@@ -2,7 +2,7 @@
 
 Read this in [portuguese](README.pt_BR.md) or [english](README.md).
 
-BlueFairy is a library to make arduino easier. At the beginning was builded to make simple work with intervals, but now, has some more utilities.
+BlueFairy is a library to make arduino easier. At the beginning was built to make simple work with intervals, but now, has some more utilities.
 
 ### First Steps
 
