@@ -1,4 +1,4 @@
-# BlueFairy
+# BlueFairy ![bluefairy logo](/assets/logo.svg)
 
 Read this in [portuguese](README.pt_BR.md) or [english](README.md).
 
