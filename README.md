@@ -10,7 +10,7 @@
 
 
 ### Scheduler
-[example](/examples/Scheduler/Scheduler.ino)
+[example](/examples/Blink/Blink.ino)
 ### Keyboard
 [example](/examples/Keyboard/Keyboard.ino)
 ### StateMachine
