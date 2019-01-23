@@ -42,7 +42,7 @@ Now you want to add a button that when is pressed turn off the blinker, I think 
 const unsigned char LED_PIN = 13;
 const unsigned char BUTTON_PIN = 1;
 
-unsigned char buttonValue = 0;
+unsigned char blinkerOn = 1;
 
 void setup() {
     pinMode(LED_PIN, OUTPUT);
@@ -50,22 +50,15 @@ void setup() {
 }
 
 void loop() {
-    buttonValue = digitalRead(BUTTON_PIN);
-    if(buttonValue){
-        digitalWrite(LED_PIN, 0);
-    }
-    else{
-        delay(500);
-        digitalWrite(LED_PIN, 0);
-        delay(500);
-        digitalWrite(LED_PIN, 1);
-    }
+    blinkerOn = !digitalRead(BUTTON_PIN);
+    delay(500);
+    digitalWrite(LED_PIN, 0 & blinkerOn);
+    delay(500);
+    digitalWrite(LED_PIN, 1 & blinkerOn);
 }
 ```
+When the `delay` function is called the program stops, and do nothing until the defined time over. So, during the delay the `blinkerOn` will not be updated and your program could have a delay to response the button press.
 
-
-When the `delay` function is called your code stops, and do nothing until the defined time over.
-If you want to do something during these intervals you need to write some code between these delays. And if that code had a delay call you could got a problem.
 So let's rewrite that using the scheduler.
 
 ```c++
@@ -74,14 +67,20 @@ So let's rewrite that using the scheduler.
 bluefairy::Scheduler scheduler;
 
 const unsigned char LED_PIN = 13;
+const unsigned char BUTTON_PIN = 1;
+
+unsigned char blinkerOn = 1;
 
 void setup() {
     pinMode(LED_PIN, OUTPUT);
     scheduler.every(0, 1000, [](){
-        digitalWrite(LED_PIN, 0);
+        digitalWrite(LED_PIN, 0 & blinkerOn);
     });
     scheduler.every(500, 1000, [](){
-        digitalWrite(LED_PIN, 1);
+        digitalWrite(LED_PIN, 1 & blinkerOn);
+    });
+    scheduler.every(50, [](){
+        blinkerOn = !digitalRead(BUTTON_PIN);
     });
 }
 
@@ -90,11 +89,10 @@ void loop() {
 }
 ```
 
+Now the `blinkerOn` will be updated every 50 milliseconds and the LED will blink with the same interval, just like the last example.
 
+The [blink example](/examples/Blink/Blink.ino) use the scheduler to blink fast five times and after 3 seconds blink slower.
 
-
-
-[example](/examples/Blink/Blink.ino)
 ### Keyboard
 [example](/examples/Keyboard/Keyboard.ino)
 ### StateMachine
