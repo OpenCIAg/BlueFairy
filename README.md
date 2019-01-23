@@ -94,9 +94,16 @@ Now the `blinkerOn` will be updated every 50 milliseconds and the LED will blink
 The [blink example](/examples/Blink/Blink.ino) use the scheduler to blink fast five times and after 3 seconds blink slower.
 
 ### Keyboard
-[example](/examples/Keyboard/Keyboard.ino)
+
+The keyboard abstract things to treat inputs, they provide a way to define callbacks functions for events fired by the inputs.
+Basically the keyboard verify each input periodically and when a change is detected your callback function is called.
+
+The [keyboard example](/examples/Keyboard/Keyboard.ino) listen some inputs and just send, through the serial port, info about each event.
+
 ### StateMachine
+
 [example](/examples/State/State.ino)
+
 ### Namespace
 
 If you don't know what are c++ namespaces you really need to read that:
