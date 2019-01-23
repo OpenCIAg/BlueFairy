@@ -24,6 +24,10 @@ namespace ciag {
 
         }
 
+        DebugStateDecorator(const DebugStateDecorator<S>& orig) : name(orig.name), output(orig.output), state(orig.state) {
+
+        }
+
         void enter() {
             this->output.print("Entering at state ");
             this->output.println(this->name);
@@ -44,14 +48,12 @@ namespace ciag {
         const char * const name;
         Stream& output;
         S state;
-    private:
-        DebugStateDecorator(const DebugStateDecorator*);
     };
 
     template<typename EF =runnable, typename LF=runnable>
-    class GenericState {
+    class FunctionalState {
     public:
-        GenericState(EF enterFunction, LF leaveFunction) : enterFunction(enterFunction), leaveFunction(leaveFunction) {}
+        FunctionalState(EF enterFunction, LF leaveFunction) : enterFunction(enterFunction), leaveFunction(leaveFunction) {}
         void enter() { this->enterFunction(); }
         void leave() { this->leaveFunction(); }
     protected:
@@ -60,8 +62,18 @@ namespace ciag {
     };
 
     template<typename EF=runnable, typename LF=runnable>
-    GenericState<EF,LF> makeState(EF enterFunction, LF leaveFunction) {
-        return GenericState<EF,LF>(enterFunction, leaveFunction);
+    FunctionalState<EF,LF> makeState(EF enterFunction, LF leaveFunction) {
+        return FunctionalState<EF,LF>(enterFunction, leaveFunction);
+    }
+
+    template<typename EF=runnable, typename LF=runnable>
+    DebugStateDecorator< FunctionalState<EF,LF> > makeState(Stream& output,const char * const name, EF enterFunction, LF leaveFunction){
+        return DebugStateDecorator< FunctionalState<EF,LF> >(name, output, makeState(enterFunction, leaveFunction));
+    }
+
+    template<typename E>
+    DebugStateDecorator<E> makeState(Stream& output, const char * const name, E state){
+        return DebugStateDecorator< E >(name, output, state);
     }
 
     class NullState : public State {
@@ -69,43 +81,90 @@ namespace ciag {
         void leave(){};
     };
 
+    NullState NULL_STATE;
+
+
+    template<typename E>
+    class TemplateState: public State {
+    public:
+        TemplateState(E state) : state(state){} ;
+        void enter(){ this->state.enter(); }
+        void leave(){ this->state.leave(); }
+    protected:
+        E state;
+    };
+
+    class StateHolder : public State{
+    public:
+        StateHolder();
+        template<typename E>
+        StateHolder& operator=(E innerState);
+        void enter();
+        void leave();
+        void clear();
+    protected:
+        State * state;
+    };
+
+    template<typename E>
+    StateHolder& StateHolder::operator=(E innerState){
+        this->clear();
+        this->state = new TemplateState<E>(innerState);
+    }
+
+    StateHolder::StateHolder() {
+        this->state = &NULL_STATE;
+    }
+
+    void StateHolder::enter() {
+        this->state->enter();
+    }
+
+    void StateHolder::leave() {
+        this->state->leave();
+    }
+
+    void StateHolder::clear(){
+        if(this->state == &NULL_STATE){
+            return;
+        }
+        delete this->state;
+        this->state = &NULL_STATE;
+    }
+
     template<size_t SIZE>
     class StateMachine {
     public:
         StateMachine();
         ~StateMachine();
         void toState(size_t stateIndex);
-        State *& operator[](size_t stateIndex);
+        StateHolder& operator[](size_t stateIndex);
     protected:
-        NullState nullState;
-        State* currentState;
-        State* states[SIZE];
+        size_t currentState;
+        StateHolder states[SIZE];
     };
 
     template<size_t SIZE>
     StateMachine<SIZE>::StateMachine(){
-        this->currentState = &this->nullState;
-        for(size_t i = 0; i > SIZE ; ++i) {
-            this->states[i] = NULL;
-        }
+        this->currentState = 0;
     }
 
     template<size_t SIZE>
     StateMachine<SIZE>::~StateMachine(){
         for(size_t i = 0; i > SIZE ; ++i) {
-            safeClean(this->states[i]);
+            this->states[i].clear();
         }
     }
 
     template<size_t SIZE>
     void StateMachine<SIZE>::toState(size_t stateIndex) {
-        this->currentState->leave();
-        this->currentState = this->states[stateIndex];
-        this->currentState->enter();
+        this->states[currentState].leave();
+        this->currentState = stateIndex;
+        this->states[currentState].enter();
     }
 
     template<size_t SIZE>
-    State *& StateMachine<SIZE>::operator[](size_t stateIndex) {
+    StateHolder& StateMachine<SIZE>::operator[](size_t stateIndex) {
         return this->states[stateIndex];
     }
 

@@ -48,9 +48,9 @@ InitState initState;
 
 void setup() {
     Serial.begin(9600);
-    stateMachine[AppState::INIT] = new ciag::DebugStateDecorator<InitState&>("INIT",Serial, initState);
-    stateMachine[AppState::FIRST] = new ciag::DebugStateDecorator<ciag::GenericState<>>("FIRST",Serial, ciag::makeState(
-        (ciag::runnable)[](){
+    stateMachine[AppState::INIT] = ciag::makeState<InitState&>(Serial, "INIT", initState);
+    stateMachine[AppState::FIRST] = ciag::makeState(Serial, "FIRST", 
+        [](){
             blinkAnnimation
                 .every(250, toggleLed)
                 .every( 125, 250, toggleLed);
@@ -61,11 +61,11 @@ void setup() {
                 stateMachine.toState(INIT);
             };
         },
-        (ciag::runnable)[](){
+        [](){
             keyboard.clear();
             blinkAnnimation.cancel();
         }
-    ));
+    );
     scheduler.every(2000,[](){ keyboard.tick(); });
     stateMachine.toState(AppState::INIT);
 }
