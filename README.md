@@ -108,7 +108,7 @@ The [keyboard example](/examples/Keyboard/Keyboard.ino) listen some inputs and j
 
 If you don't know what are c++ namespaces you really need to read that:
 
-We use namespaces, so, you can always write thta as a type prefix or "import" the namespace with `using`.
+We use namespaces, so, you can always write that as a type prefix or "import" the namespace with `using`.
 The `bluefairy` namespace is just a alias for `ciag::bluefairy` namespace, you can choice what you prefer.
 
 Using like a type prefix:
