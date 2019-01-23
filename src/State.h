@@ -1,7 +1,6 @@
 #ifndef __CIAG_STATE__
 #define __CIAG_STATE__
 
-#include "ciag.h"
 #include "Arduino.h"
 #include "Scheduler.h"
 
@@ -81,9 +80,6 @@ namespace ciag {
         void leave(){};
     };
 
-    NullState NULL_STATE;
-
-
     template<typename E>
     class TemplateState: public State {
     public:
@@ -110,26 +106,6 @@ namespace ciag {
     StateHolder& StateHolder::operator=(E innerState){
         this->clear();
         this->state = new TemplateState<E>(innerState);
-    }
-
-    StateHolder::StateHolder() {
-        this->state = &NULL_STATE;
-    }
-
-    void StateHolder::enter() {
-        this->state->enter();
-    }
-
-    void StateHolder::leave() {
-        this->state->leave();
-    }
-
-    void StateHolder::clear(){
-        if(this->state == &NULL_STATE){
-            return;
-        }
-        delete this->state;
-        this->state = &NULL_STATE;
     }
 
     template<size_t SIZE>
