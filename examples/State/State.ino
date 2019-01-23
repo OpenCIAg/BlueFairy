@@ -1,6 +1,4 @@
-#include "State.h"
-#include "Scheduler.h"
-#include "Keyboard.h"
+#include <bluefairy.h>
 
 const int LED_PIN = 13;
 int LED_VALUE = 0;
@@ -10,10 +8,10 @@ void toggleLed(){
     digitalWrite(LED_PIN, LED_VALUE);
 }
 
-ciag::Scheduler scheduler;
-ciag::Keyboard<2> keyboard((byte[]){0, 1});
-ciag::StateMachine<2> stateMachine;
-ciag::Scheduler::Group blinkAnnimation =  scheduler.group();
+bluefairy::Scheduler scheduler;
+bluefairy::Keyboard<2> keyboard((byte[]){0, 1});
+bluefairy::StateMachine<2> stateMachine;
+bluefairy::Scheduler::Group blinkAnnimation =  scheduler.group();
 
 enum Button {
     Next = 0,
@@ -26,13 +24,13 @@ enum AppState {
 };
 
 
-class InitState : public ciag::State {
+class InitState : public bluefairy::State {
 public:
     void enter(){
         blinkAnnimation
             .every(500, toggleLed)
             .every( 250, 500, toggleLed);
-        keyboard.onKeyUp[Next] = [](const ciag::KeyEvent& keyEvent) {
+        keyboard.onKeyUp[Next] = [](const bluefairy::KeyEvent& keyEvent) {
             stateMachine.toState(FIRST);
         };
     }
@@ -47,16 +45,16 @@ InitState initState;
 
 void setup() {
     Serial.begin(9600);
-    stateMachine[AppState::INIT] = ciag::makeState<InitState&>(Serial, "INIT", initState);
-    stateMachine[AppState::FIRST] = ciag::makeState(Serial, "FIRST", 
+    stateMachine[AppState::INIT] = bluefairy::makeState<InitState&>(Serial, "INIT", initState);
+    stateMachine[AppState::FIRST] = bluefairy::makeState(Serial, "FIRST", 
         [](){
             blinkAnnimation
                 .every(250, toggleLed)
                 .every( 125, 250, toggleLed);
-            keyboard.onKeyUp[Next] = [](const ciag::KeyEvent& keyEvent) {
+            keyboard.onKeyUp[Next] = [](const bluefairy::KeyEvent& keyEvent) {
                 stateMachine.toState(FIRST);
             };
-            keyboard.onKeyUp[Prev] = [](const ciag::KeyEvent& keyEvent) {
+            keyboard.onKeyUp[Prev] = [](const bluefairy::KeyEvent& keyEvent) {
                 stateMachine.toState(INIT);
             };
         },

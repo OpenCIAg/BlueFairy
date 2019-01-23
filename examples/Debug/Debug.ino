@@ -1,9 +1,9 @@
-#include "Scheduler.h"
+#include <bluefairy.h>
 
 const int LED_PIN = 13;
 int LED_VALUE = 0;
 
-ciag::Scheduler scheduler;
+bluefairy::Scheduler scheduler;
 
 void toggleLed(){
     LED_VALUE = (LED_VALUE + 1) % 2;

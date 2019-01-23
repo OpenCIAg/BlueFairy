@@ -2,11 +2,11 @@
 #include <stdio.h>
 #include <cmath>
 #include <gtest/gtest.h>
-#include "Scheduler.h"
+#include "bluefairy.h"
 #include <iostream>
 
 
-using namespace ciag;
+using namespace ciag::bluefairy;
 
 
 int counter = 1;
