@@ -10,11 +10,11 @@
 
 
 ### Scheduler
-
+[example](/examples/Scheduler/Scheduler.ino)
 ### Keyboard
-
+[example](/examples/Keyboard/Keyboard.ino)
 ### StateMachine
-
+[example](/examples/State/State.ino)
 ### Namespace
 
 If you don't know what are c++ namespaces you really need to read that:
