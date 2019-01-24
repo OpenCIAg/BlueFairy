@@ -2,7 +2,7 @@
 
 Read this in [portuguese](README.pt_BR.md) or [english](README.md).
 
-BlueFairy is a library to make arduino easier. At the beginning was built to make simple work with intervals, but now, has some more utilities.
+BlueFairy is a library to make arduino easier. It started as a library to simplify work with intervals, but now it has some more utilities.
 
 ### First Steps
 
@@ -14,11 +14,11 @@ Include the **bluefairy** library:
 
 ### Scheduler
 
-The main idea of `Scheduler` is avoid the use of the funcion `delay` in your code.
-At that way your code can run **almost** as a multitask program.
+The main idea of `Scheduler` is to avoid the use of the  `delay` funcion in your code.
+This way your code can run **almost** as a multitask program.
 
 
-Imagine that you want to blink a LED with an interval of 1 second like that:
+Imagine that you want to blink a LED with an interval of 1 second:
 
 ```c++
 const unsigned char LED_PIN = 13;
@@ -35,7 +35,7 @@ void loop() {
 }
 ```
 
-Now you want to add a button that when is pressed turn off the blinker, I think that most trivial way to do this is like that:
+Now you want to add a button that when pressed turns off the blinker. The most trivial way to do this is:
 
 
 ```c++
@@ -57,9 +57,10 @@ void loop() {
     digitalWrite(LED_PIN, 1 & blinkerOn);
 }
 ```
-When the `delay` function is called the program stops, and do nothing until the defined time over. So, during the delay the `blinkerOn` will not be updated and your program could have a delay to response the button press.
 
-So let's rewrite that using the scheduler.
+When the `delay` function is called, the program stops and do nothing until the defined time over. So, during the delay, the `blinkerOn` will not be updated and your program could have a delay to respond the button press.
+
+So let's rewrite that using `Scheduler`:
 
 ```c++
 #include <bluefairy.h>
@@ -94,24 +95,24 @@ void loop() {
 }
 ```
 
-Now the `blinkerOn` will be updated every 50 milliseconds and the LED will blink with the same interval, just like the last example.
+Now `blinkerOn` will be updated every 50 milliseconds and the LED will blink with the same interval, just like the last example.
 
-The [blink example](/examples/Blink/Blink.ino) use the scheduler to blink fast five times and after 3 seconds blink slower.
+The [blink example](/examples/Blink/Blink.ino) uses the scheduler to blink fast five times and after 3 seconds blink slower.
 
 ### Keyboard
 
-The keyboard abstract things to treat inputs, they provide a way to define callbacks functions for events fired by the inputs.
+The keyboard abstract things to treat inputs. They provide a way to define callbacks functions for events fired by the inputs.
 Basically the keyboard verify each input periodically and when a change is detected your callback function is called.
 
-The [keyboard example](/examples/Keyboard/Keyboard.ino) listen some inputs and just send, through the serial port, info about each event.
+The [keyboard example](/examples/Keyboard/Keyboard.ino) listen some inputs and just send info about each event through the serial port.
 
 ### StateMachine
 
-The state machine is just a way to help at the organization of the code, they provide a pattern to define what to do when enter or leave a state. At the [example](/examples/State/State.ino) there a state that a LED blink fast and a state that the LED blink slowly and some buttons define when change the state.
+The state machine is just a way to help with the organization of the code. They provide a pattern to define what to do when entering or leaving a state. In the [example](/examples/State/State.ino) there is a state where a LED blink fast, a state where the LED blink slowly and some buttons define when the state is changed.
 
 ### Namespace
 
-The `bluefairy` namespace is just a alias for `ciag::bluefairy` namespace, you can choice what you prefer.
+The `bluefairy` namespace is just an alias for `ciag::bluefairy` namespace, you can choose what you prefer.
 
 Some examples:
 
