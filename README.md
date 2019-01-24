@@ -130,6 +130,7 @@ Scheduler scheduler;
 
 ```c++
 using bluefairy::Scheduler;
+using ciag::bluefairy::Scheduler;
 
 Scheduler scheduler;
 ```
