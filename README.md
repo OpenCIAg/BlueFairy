@@ -70,17 +70,22 @@ const unsigned char LED_PIN = 13;
 const unsigned char BUTTON_PIN = 1;
 
 unsigned char blinkerOn = 1;
+unsigned char ledValue = 0;
 
 void setup() {
     pinMode(LED_PIN, OUTPUT);
+    pinMode(BUTTON_PIN, INPUT);
     scheduler.every(0, 1000, [](){
-        digitalWrite(LED_PIN, 0 & blinkerOn);
+        ledValue = 0;
+        digitalWrite(LED_PIN, ledValue & blinkerOn);
     });
     scheduler.every(500, 1000, [](){
-        digitalWrite(LED_PIN, 1 & blinkerOn);
+        ledValue = 1;
+        digitalWrite(LED_PIN, ledValue & blinkerOn);
     });
     scheduler.every(50, [](){
         blinkerOn = !digitalRead(BUTTON_PIN);
+        digitalWrite(LED_PIN, ledValue & blinkerOn);
     });
 }
 
@@ -102,27 +107,28 @@ The [keyboard example](/examples/Keyboard/Keyboard.ino) listen some inputs and j
 
 ### StateMachine
 
-[example](/examples/State/State.ino)
+The state machine is just a way to help at the organization of the code, they provide a pattern to define what to do when enter or leave a state. At the [example](/examples/State/State.ino) there a state that a LED blink fast and a state that the LED blink slowly and some buttons define when change the state.
 
 ### Namespace
 
-If you don't know what are c++ namespaces you really need to read that:
-
-We use namespaces, so, you can always write that as a type prefix or "import" the namespace with `using`.
 The `bluefairy` namespace is just a alias for `ciag::bluefairy` namespace, you can choice what you prefer.
 
-Using like a type prefix:
+Some examples:
 
 ```c++
 ciag::bluefairy::Scheduler scheduler;
 bluefairy::Scheduler scheduler;
 ```
 
-"Import" with `using`:
+```c++
+using namespace bluefairy;
+using namespace ciag::bluefairy;
+
+Scheduler scheduler;
+```
 
 ```c++
-using bluefairy;
-using ciag::bluefairy;
+using bluefairy::Scheduler;
 
 Scheduler scheduler;
 ```
