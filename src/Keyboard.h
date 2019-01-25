@@ -111,7 +111,10 @@ namespace ciag {
         template<size_t SIZE>
         void Keyboard<SIZE>::turnOff() {
             this->active = false;
-            this->clear();
+            for(size_t i =0;i<SIZE;++i){
+                this->holdTicks[i] = 0;
+                this->lastChange[i] = 0;
+            }
         }
 
         template<size_t SIZE>
