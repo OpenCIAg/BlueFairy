@@ -59,5 +59,5 @@ void setup() {
 }   
 
 void loop() {
-    scheduler.tick();
+    scheduler.loop();
 }
