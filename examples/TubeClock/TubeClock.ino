@@ -3,21 +3,21 @@
 
 bluefairy::Scheduler scheduler;
 
-auto Digit0 = bluefairy::IO.digitalOutput(11);
-auto Digit1 = bluefairy::IO.digitalOutput(12);
-auto Digit2 = bluefairy::IO.digitalOutput(13);
-auto Digit3 = bluefairy::IO.digitalOutput(14);
+auto Digit0 = bluefairy::IO.digitalOutput(A0);
+auto Digit1 = bluefairy::IO.digitalOutput(A1);
+auto Digit2 = bluefairy::IO.digitalOutput(A2);
+auto Digit3 = bluefairy::IO.digitalOutput(A3);
 
-auto Number0 = bluefairy::IO.digitalOutput(1);
-auto Number1 = bluefairy::IO.digitalOutput(2);
-auto Number2 = bluefairy::IO.digitalOutput(3);
-auto Number3 = bluefairy::IO.digitalOutput(4);
-auto Number4 = bluefairy::IO.digitalOutput(5);
-auto Number5 = bluefairy::IO.digitalOutput(6);
-auto Number6 = bluefairy::IO.digitalOutput(7);
-auto Number7 = bluefairy::IO.digitalOutput(8);
-auto Number8 = bluefairy::IO.digitalOutput(9);
-auto Number9 = bluefairy::IO.digitalOutput(10);
+auto Number0 = bluefairy::IO.digitalOutput(2);
+auto Number1 = bluefairy::IO.digitalOutput(3);
+auto Number2 = bluefairy::IO.digitalOutput(6);
+auto Number3 = bluefairy::IO.digitalOutput(7);
+auto Number4 = bluefairy::IO.digitalOutput(8);
+auto Number5 = bluefairy::IO.digitalOutput(9);
+auto Number6 = bluefairy::IO.digitalOutput(10);
+auto Number7 = bluefairy::IO.digitalOutput(11);
+auto Number8 = bluefairy::IO.digitalOutput(12);
+auto Number9 = bluefairy::IO.digitalOutput(13);
 
 bluefairy::DigitalOutput* digits[4] = {
     &Digit0,
