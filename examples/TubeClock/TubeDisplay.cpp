@@ -1,12 +1,21 @@
 #include "TubeDisplay.h"
 
+using namespace bluefairy;
 
-TubeDisplay::TubeDisplay() {
-    this->totalDigits = 4;
+TubeDisplay::TubeDisplay(
+    unsigned int totalDigits,
+    DigitalOutput** numberSelector,
+    DigitalOutput** digitSelector
+) {
+    this->totalDigits = totalDigits;
+    this->numberSelector = numberSelector;
+    this->digitSelector = digitSelector;
+    this->value = new unsigned char[totalDigits];
 }
 
 TubeDisplay::~TubeDisplay(){
     this->turnOff();
+    delete[] this->value;
 }
 
 void TubeDisplay::setValue(const unsigned char* const value) {

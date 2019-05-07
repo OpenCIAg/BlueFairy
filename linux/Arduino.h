@@ -9,6 +9,10 @@
 #include <math.h>
 #include <time.h>
 
+#define HIGH 0x1
+#define LOW 0x0
+
+
 typedef unsigned char byte;
 typedef unsigned char uint8_t;
 
