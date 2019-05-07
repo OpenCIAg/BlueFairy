@@ -1,11 +1,9 @@
 #include "TubeDisplay.h"
 
-using namespace bluefairy;
-
 TubeDisplay::TubeDisplay(
     unsigned int totalDigits,
-    DigitalOutput** numberSelector,
-    DigitalOutput** digitSelector
+    bluefairy::DigitalOutput** numberSelector,
+    bluefairy::DigitalOutput** digitSelector
 ) {
     this->totalDigits = totalDigits;
     this->numberSelector = numberSelector;

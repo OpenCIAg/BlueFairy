@@ -44,9 +44,19 @@ TubeDisplay tubeDisplay(
 );
 
 void setup() {
-    tubeDisplay.turnOff();
     scheduler.every(4, [](){ tubeDisplay.tick(); });
-}
+    scheduler.every(250, [](){
+        unsigned long elapsedTime = millis()/1000.0;
+        unsigned char newValue[4] = { 0, 0, 0 , 0 };
+        for( int i =3;i>=0;i-= 1){
+            const unsigned char number = ((unsigned long)(elapsedTime/pow(10,i))) % 10;
+            Serial.print(number,DEC);
+            newValue[i] = number;
+        }
+        Serial.println();
+        tubeDisplay.setValue(newValue);
+    });
+}   
 
 void loop() {
     scheduler.tick();
