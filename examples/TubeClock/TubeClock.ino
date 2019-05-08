@@ -2,6 +2,7 @@
 #include "bluefairy.h"
 
 bluefairy::Scheduler scheduler;
+bluefairy::Scheduler::Group displayLoop = scheduler.group();
 
 auto Digit0 = bluefairy::IO.digitalOutput(A0);
 auto Digit1 = bluefairy::IO.digitalOutput(A1);
@@ -43,11 +44,39 @@ TubeDisplay tubeDisplay(
     4, numbers, digits
 );
 
+unsigned short getTargetFrequency(){
+    unsigned short rawFrequency= analogRead(A5);
+    unsigned short frequency = map(rawFrequency,0,1023,1,240);
+    return frequency;
+}
+
+unsigned short currentFrequency = 1;
+
+void updateFrequency(unsigned short frequency) {
+    displayLoop.cancel();
+    currentFrequency = frequency;
+    unsigned short dt = 1000 / frequency;
+    displayLoop.every(dt, [](){ tubeDisplay.tick(); } );
+    Serial.print("Frequency:");
+    Serial.println(frequency);
+}
+
+void tickFrequency() {
+    unsigned short newFrequency = getTargetFrequency();
+    if(newFrequency == currentFrequency){
+        return;
+    }
+    updateFrequency(newFrequency);
+}
+
 void setup() {
-    scheduler.every(4, [](){ tubeDisplay.tick(); });
+    Serial.begin(115200);
+    updateFrequency(currentFrequency);
+    scheduler.every(100, tickFrequency);
     scheduler.every(250, [](){
         unsigned long elapsedTime = millis()/1000.0;
         unsigned char newValue[4] = { 0, 0, 0 , 0 };
+        Serial.print("Time:");
         for( int i =3;i>=0;i-= 1){
             const unsigned char number = ((unsigned long)(elapsedTime/pow(10,i))) % 10;
             Serial.print(number,DEC);
