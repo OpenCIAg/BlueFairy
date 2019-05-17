@@ -187,6 +187,7 @@ namespace ciag {
             virtual bool run() {
                 this->action();
                 this->when += this->interval;
+                this->when = max(this->when, millis());
                 this->scheduler.addTask(this);
                 return false;
             }

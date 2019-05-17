@@ -9,6 +9,10 @@
 #include <math.h>
 #include <time.h>
 
+#define HIGH 0x1
+#define LOW 0x0
+
+
 typedef unsigned char byte;
 typedef unsigned char uint8_t;
 
@@ -246,5 +250,7 @@ V max(V a ,V b){
     return b;
   }
 }
+
+long map(long x, long in_min, long in_max, long out_min, long out_max);
 
 #endif

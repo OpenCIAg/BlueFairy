@@ -53,7 +53,7 @@ namespace ciag {
         template<typename EF =runnable, typename LF=runnable>
         class FunctionalState {
         public:
-            FunctionalState(EF enterFunction, LF leaveFunction) : enterFunction(enterFunction), leaveFunction(leaveFunction) {}
+            FunctionalState(const EF& enterFunction, const LF& leaveFunction) : enterFunction(enterFunction), leaveFunction(leaveFunction) {}
             void enter() { this->enterFunction(); }
             void leave() { this->leaveFunction(); }
         protected:
@@ -62,17 +62,17 @@ namespace ciag {
         };
 
         template<typename EF=runnable, typename LF=runnable>
-        FunctionalState<EF,LF> makeState(EF enterFunction, LF leaveFunction) {
+        inline FunctionalState<EF,LF> makeState(const EF& enterFunction, const LF& leaveFunction) {
             return FunctionalState<EF,LF>(enterFunction, leaveFunction);
         }
 
         template<typename EF=runnable, typename LF=runnable>
-        DebugStateDecorator< FunctionalState<EF,LF> > makeState(Stream& output,const char * const name, EF enterFunction, LF leaveFunction){
+        inline DebugStateDecorator< FunctionalState<EF,LF> > makeState(Stream& output,const char * const name, const EF& enterFunction, const LF& leaveFunction){
             return DebugStateDecorator< FunctionalState<EF,LF> >(name, output, makeState(enterFunction, leaveFunction));
         }
 
         template<typename E>
-        DebugStateDecorator<E> makeState(Stream& output, const char * const name, E state){
+        inline DebugStateDecorator<E> makeState(Stream& output, const char * const name, const E& state){
             return DebugStateDecorator< E >(name, output, state);
         }
 
@@ -84,7 +84,7 @@ namespace ciag {
         template<typename E>
         class TemplateState: public State {
         public:
-            TemplateState(E state) : state(state){} ;
+            TemplateState(const E& state) : state(state){} ;
             void enter(){ this->state.enter(); }
             void leave(){ this->state.leave(); }
         protected:
@@ -95,7 +95,7 @@ namespace ciag {
         public:
             StateHolder();
             template<typename E>
-            StateHolder& operator=(E innerState);
+            StateHolder& operator=(const E& innerState);
             void enter();
             void leave();
             void clear();
@@ -104,7 +104,7 @@ namespace ciag {
         };
 
         template<typename E>
-        StateHolder& StateHolder::operator=(E innerState){
+        StateHolder& StateHolder::operator=(const E& innerState){
             this->clear();
             this->state = new TemplateState<E>(innerState);
             return *this;

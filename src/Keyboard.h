@@ -36,12 +36,12 @@ namespace ciag {
         protected:
             T onPerform;
         public:
-            TemplateKeyAction(T onPerform);
+            TemplateKeyAction(const T& onPerform);
             void perform(const KeyEvent& keyEvent);
         };
 
         template<typename T>
-        TemplateKeyAction<T>::TemplateKeyAction(T onPerform) : onPerform(onPerform) {
+        TemplateKeyAction<T>::TemplateKeyAction(const T& onPerform) : onPerform(onPerform) {
 
         }
 
@@ -57,13 +57,13 @@ namespace ciag {
             void clear();
             void operator()(const KeyEvent&);
             template<typename T>
-            KeyActionHolder& operator=(T action);
+            KeyActionHolder& operator=(const T& action);
         protected:
             KeyAction * keyAction;
         };
 
         template<typename T>
-        KeyActionHolder&  KeyActionHolder::operator=(T action){
+        KeyActionHolder&  KeyActionHolder::operator=(const T& action){
             this->clear();
             this->keyAction = new TemplateKeyAction<T>(action);
             return *this;
@@ -111,7 +111,10 @@ namespace ciag {
         template<size_t SIZE>
         void Keyboard<SIZE>::turnOff() {
             this->active = false;
-            this->clear();
+            for(size_t i =0;i<SIZE;++i){
+                this->holdTicks[i] = 0;
+                this->lastChange[i] = 0;
+            }
         }
 
         template<size_t SIZE>

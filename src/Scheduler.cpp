@@ -53,7 +53,7 @@ namespace ciag {
         void Scheduler::loop() {
             while(this->headNode.next != NULL){
                 const unsigned long wait = this->tick();
-                delay(wait);
+                if (wait) delay(wait);
             }
         }
 
@@ -75,7 +75,7 @@ namespace ciag {
 
         TaskNode * Scheduler::addTask(TaskNode * newNode) {
             TaskNode * node = &this->headNode;
-            while(node->next != NULL && node->next->when < newNode->when){
+            while(node->next != NULL && node->next->when <= newNode->when){
                 node = node->next;
             }
             newNode->next = node->next;
