@@ -30,7 +30,7 @@ TEST(PID, FindAcceleration) {
 TEST(PID, GotoPoint) {
   double target = 2500.0;
   unsigned long t = 0;
-  PID<double> pid(0.70, 0.28, 1.8);
+  PID<double> pid(0.1, 0.1, 0.9);
   pid.setInput(0, t);
   double g = 9.8;
   double ac = 0;
@@ -50,7 +50,7 @@ TEST(PID, GotoPoint) {
     //de += ds;
     printf("c=%f,\tac=%f,\tds=%f,\tde=%f,\tt=%d\n", correction, ac, ds, de, t);
   }
-  EXPECT_EQ(round(de), target);
+  EXPECT_EQ(round(de / 10), target / 10);
 }
 
 int main(int argc, char** argv) {
