@@ -6,7 +6,7 @@
 
 using namespace bluefairy;
 
-TEST(PID, InitAbsolute) {
+TEST(PID, FindAcceleration) {
   double target = 30.0;
   unsigned long t = 0;
   PID<double> pid(1.0, 0.5, 0.9);
@@ -19,12 +19,38 @@ TEST(PID, InitAbsolute) {
   for (int i = 0; i < 1000; i++) {
     t += inc;
     pid.setInput(ds, t);
-    double result = pid.getOutput();
-    ac += result;
+    double correction = pid.getOutput();
+    ac += correction;
     ds += (ac - g) * ((double)inc / 1000.0);
-    printf("r=%f,ac=%f,ds=%f,t=%d\n", result, ac, ds, t);
+    printf("c=%f,\tac=%f,\tds=%f,\tt=%d\n", correction, ac, ds, t);
   }
   EXPECT_EQ(round(ds), target);
+}
+
+TEST(PID, GotoPoint) {
+  double target = 2500.0;
+  unsigned long t = 0;
+  PID<double> pid(0.70, 0.28, 1.8);
+  pid.setInput(0, t);
+  double g = 9.8;
+  double ac = 0;
+  double ds = 0;
+  double de = 0;
+  int inc = 50;
+  pid.setTarget(target);
+  for (int i = 0; i < 10000; i+=1) {
+    t += inc;
+    pid.setInput(de, t);
+    double correction = pid.getOutput();
+    double lastAccelaration = ac;
+    ac = std::min(std::max(ac + correction, 0.0), 50.0);
+    double lastSpeed = ds;
+    ds += (ac - g) * ((double)inc / 1000.0);
+    de += (ds * 2   + lastSpeed) / 3.0;
+    //de += ds;
+    printf("c=%f,\tac=%f,\tds=%f,\tde=%f,\tt=%d\n", correction, ac, ds, de, t);
+  }
+  EXPECT_EQ(round(de), target);
 }
 
 int main(int argc, char** argv) {
