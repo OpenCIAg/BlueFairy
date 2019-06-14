@@ -15,6 +15,8 @@ namespace ciag {
       PID(V kp, V ki, V kd);
       PID(const PID& pid);
       virtual ~PID();
+      void setInputLimits(const V& minInput, const V& maxInput);
+      void setOutputLimits(const V& minOutput, const V& maxOutput);
       void setInput(const V& value);
       void setInput(const V& value, unsigned long t);
       V update(V feedback, unsigned long interval);
@@ -32,12 +34,21 @@ namespace ciag {
       unsigned long lastTime;
       V integral;
       V error;
-      V ouput;
+      V ouput = 0.;
       V target;
+
+      V minInput = -1.;
+      V maxInput = 1.;
+
+      V minOutput = -1.;
+      V maxOutput = 1.;
 
       V kp;
       V ki;
       V kd;
+
+      V map(const V& x);
+      V fixOutput(const V& x);
 
       bool errorMagnitudeChanged(V newError) const;
     };
@@ -71,6 +82,28 @@ namespace ciag {
 
     template <typename V>
     PID<V>::~PID() {
+    }
+
+    template <typename V>
+    inline void PID<V>::setInputLimits(const V& minInput, const V& maxInput) {
+      this->minInput = minInput;
+      this->maxInput = maxInput;
+    }
+
+    template <typename V>
+    inline void PID<V>::setOutputLimits(const V& minOutput, const V& maxOutput) {
+      this->minOutput = minOutput;
+      this->maxOutput = maxOutput;
+    }
+
+    template <typename V>
+    V PID<V>::map(const V& x) {
+      return (x - this->minInput) * (this->maxOutput - this->minOutput) / (this->maxInput - this->minInput) + this->minOutput;
+    }
+
+    template <typename V>
+    V PID<V>::fixOutput(const V& x) {
+      return min(max(this->minOutput, x), this->maxOutput);
     }
 
     template <typename V>
@@ -117,8 +150,9 @@ namespace ciag {
         d = 0;
       }
       this->error = error;
-      this->ouput = p + i + d;
-      return this->ouput;
+      auto correction = map(p + i + d);
+      this->ouput = this->fixOutput(this->ouput + correction);
+      return correction;
     }
 
     template <typename V>
